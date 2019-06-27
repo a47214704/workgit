@@ -41,10 +41,25 @@ function parse(data,configs_obj,index){
 		setTimeout(function(){
 			delaytime(configs_obj);
 		},1*1000);
+		
+	}else if(obj.data[0].expect > configs_obj.nextIssue){
+		//意外未开出reset Issue output Issue
+		var fs = require('fs');//file save
+		// append data to file
+		fs.appendFile('未开记录.txt',"\r\n" + parseInt(configs_obj.lastIssue) + 1 + "~" + obj.data[0].expect + "未开出", 'utf8',
+			// callback function
+			function(err) { 
+				if (err) throw err;
+				// if no error
+				console.log("Issue is appended to file successfully.")
+		});
+		//reset configs
+		configs_obj.lastIssue = obj.data[0].expect;
+		configs_obj.nextIssue = parseInt(configs_obj.lastIssue)+1;
 	}
 	
 	//after 30S do something
-	if(index == configs.length-1){//假如到foreach到最后一个阵列重新search
+	if(index == configs.length - 1){//假如到foreach到最后一个阵列重新search
 		setTimeout(function(){
 			research();
 		},30*1000);
@@ -66,9 +81,9 @@ function delaytime(configs_obj){//读取总延迟时间
 			
 			for(var i=0;i<obj.data.length;i++){
 				console.log("开奖号:"+obj.data[i].expect+"开奖资讯:"+JSON.stringify(obj.data[i]));//开奖资讯
-				if((i+1)<obj.data.length && (obj.data[i].opentime.substring(8,10) == obj.data[i+1].opentime.substring(8,10)) ){
+				if((i+1)<obj.data.length && ( parseInt(obj.data[i].opentimestamp) - parseInt(obj.data[i+1].opentimestamp) < 3600) ){//out of 1hour
 					averagetime+=(obj.data[i].opentimestamp-obj.data[i+1].opentimestamp)-parseInt(configs_obj.refresh_time);
-					checkIssue(result,i);//判断漏开
+					//checkIssue(result,i);//检查历史彩票漏开输出存党
 				}
 			}
 			console.log("平均延迟时间:"+averagetime/obj.data.length+"秒");
@@ -76,7 +91,7 @@ function delaytime(configs_obj){//读取总延迟时间
 	});
 }
 
-function checkIssue(data,ver){//检查彩票漏开输出存党
+function checkIssue(data,ver){//检查历史彩票漏开输出存党
 	var obj=JSON.parse(data);
 	if(ver>0){
 		var checkversion=parseInt(obj.data[ver-1].expect)-1;//上齐开奖号-1
