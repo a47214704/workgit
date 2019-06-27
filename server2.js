@@ -3,40 +3,44 @@ var fs = require('fs');
 
 var configs = 
 	[{
+		file_name : '北京pk10',
 		nextIssue : 0,
 		lastIssue : 0,
+		refresh_time : 1200,
 		url : 'http://a.apilottery.com/api/7ce97e72844d02773bff10fe1c6714d8/bjpk10/',
 		urlall : 'http://a.apilottery.com/api/7ce97e72844d02773bff10fe1c6714d8/bjpk10/'},
 	{
+		file_name : '马耳他幸运飞艇',
 		nextIssue : 0,
 		lastIssue : 0,
+		refresh_time : 300,
 		url : 'http://a.apilottery.com/api/7ce97e72844d02773bff10fe1c6714d8/xyft/',
 		urlall : 'http://a.apilottery.com/api/7ce97e72844d02773bff10fe1c6714d8/xyft/'}];
 
 //解析
-function parse(data,configs,index){
+function parse(data,configs_obj,index){
 	///todo
 	var obj=JSON.parse(data);
 	
-	if(obj.data[0].expect > configs.lastIssue && ((configs.nextIssue != 0 && configs.nextIssue == obj.data[0].expect) || configs.nextIssue == 0))
+	if(obj.data[0].expect > configs_obj.lastIssue && ((configs_obj.nextIssue != 0 && configs_obj.nextIssue == obj.data[0].expect) || configs_obj.nextIssue == 0))
 	{
-		configs.lastIssue=obj.data[0].expect;
-		configs.nextIssue=parseInt(configs.lastIssue)+1;
+		configs_obj.lastIssue = obj.data[0].expect;
+		configs_obj.nextIssue = parseInt(configs_obj.lastIssue)+1;
 		//file save
 		var fs = require('fs');
 		// append data to file
-		fs.appendFile('彩票记录测试.txt',"\r\n" + data, 'utf8',
+		fs.appendFile(configs_obj.file_name + '.txt',"\r\n" + data, 'utf8',
 			// callback function
 			function(err) { 
 				if (err) throw err;
 				// if no error
-				console.log(obj.data[0].expect+"Data is appended to file successfully.")
+				console.log(configs_obj.file_name + ':' + obj.data[0].expect+" Data is appended to file successfully.")
 		});
 		//console.log(lastIssue+':'+nextIssue);//开奖旗号
 		
-		/*setTimeout(function(){
-			delaytime();
-		},1*1000);*///暂时不运作
+		setTimeout(function(){
+			delaytime(configs_obj);
+		},1*1000);
 	}
 	
 	//after 30S do something
@@ -47,10 +51,9 @@ function parse(data,configs,index){
 	}
 }
 
-function delaytime(){//读取总延迟时间
+function delaytime(configs_obj){//读取总延迟时间
 	
-	url += josn;
-	http.get(url, (res) => {
+	http.get(configs_obj.url + 'json', (res) => {
 		var result = "";
 		res.setEncoding('utf8');
 		res.on('data',(chunk)=>{
@@ -64,7 +67,7 @@ function delaytime(){//读取总延迟时间
 			for(var i=0;i<obj.data.length;i++){
 				console.log("开奖号:"+obj.data[i].expect+"开奖资讯:"+JSON.stringify(obj.data[i]));//开奖资讯
 				if((i+1)<obj.data.length && (obj.data[i].opentime.substring(8,10) == obj.data[i+1].opentime.substring(8,10)) ){
-					averagetime+=(obj.data[i].opentimestamp-obj.data[i+1].opentimestamp)-1200;
+					averagetime+=(obj.data[i].opentimestamp-obj.data[i+1].opentimestamp)-parseInt(configs_obj.refresh_time);
 					checkIssue(result,i);//判断漏开
 				}
 			}
@@ -98,7 +101,7 @@ function checkIssue(data,ver){//检查彩票漏开输出存党
 }
 
 
-function request(configs,index){
+function request(configs,index){//url connect get json
 	try{
 		
 		http.get(configs.url + '1-json', (res) => {
@@ -117,8 +120,7 @@ function request(configs,index){
 		console.log(e);
 	}
 }
-function research(){
+function research(){//run all configs
 	configs.forEach(request);
 }
-research();
-//request();
+research();//excute
