@@ -1,6 +1,19 @@
 var http = require('http'); // 1 - 載入 Node.js 原生模組 http
 var fs = require('fs');
 
+var mysql = require('mysql');//载入SQL
+var connection = mysql.createConnection({
+  host     : '13.209.72.196',
+  user     : 'root',
+  password : '123456',
+  database : 'lottery_2'
+});
+try{
+	connection.connect();
+}catch(e){
+	console.log(e);
+}
+
 var configs = 
 	[{
 		file_name : '北京pk10',
@@ -26,6 +39,19 @@ function parse(data,configs_obj,index){
 	{
 		configs_obj.lastIssue = obj.data[0].expect;
 		configs_obj.nextIssue = parseInt(configs_obj.lastIssue)+1;
+		
+		//sql upload
+		var note = '';
+		var sql = "insert into lottery_record values(?,?,?,?,?,?,?)";
+		var sql_item = [obj.code,1,obj.data[0].expect,obj.data[0].opentime,obj.data[0].opencode,obj.data[0].opentimestamp,note];
+		connection.query(sql,sql_item,function(error, rows, fields){
+			//檢查是否有錯誤
+			if(error){
+				console.log(error);
+			}
+			//console.log(rows[0].school+rows[0].id+rows[0].name); //2
+		});
+		
 		//file save
 		var fs = require('fs');
 		// append data to file
