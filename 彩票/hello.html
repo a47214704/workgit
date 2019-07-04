@@ -1,0 +1,106 @@
+<html>
+
+<head>
+	<link rel="stylesheet" href="./css/table.css">
+	<script src="https://cdn.jsdelivr.net/npm/ractive"></script>
+	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+	<script type="text/javascript" language="javascript">
+		google.load("jquery", "1.3");
+	</script>
+</head>
+
+<body>
+	<div style="margin:50px;" align="center">
+		<label class="font-weight-bold">搜尋開出期號 : </label>
+		<input style="width:200px"class=""type="text" id="search_expect">
+		<button type="button" class="btn btn-outline-primary" onclick="search()">搜尋SEARCH</button>
+		
+		<div style="max-width:500px">
+			<select style="margin:10px;" onchange="changeType(this)" class="custom-select mb-3">
+				<option value="bjpk10">北京pk10</option>
+				<option value="xyft" selected>马耳他幸运飞艇</option>
+			</select>
+		</div>
+	</div>
+	<div style="margin:50px;" align="center">
+	<h2>彩票列表</h2>
+		<table width="80%"class="teble table-bordered">
+			<thead>
+				<tr>
+					<th width="10%" scope="col">版本</th>
+					<th width="10%" scope="col">狀態</th>
+					<th width="20%" scope="col">期號</th>
+					<th width="20%" scope="col">開獎時間</th>
+					<th width="30%" scope="col">開獎號碼</th>
+					<th width="10%" scope="col">備註</th>
+				</tr>
+			</thead>
+			<tbody id="target">
+				<script id="template" type="text/ractive">
+				{{#each item}}
+					<tr>
+						<td>{{type}}</td>
+						<td>{{status}}</td>
+						<td>{{expect}}</td>
+						<td>{{opentime}}</td>
+						<td>{{opencode}}</td>
+						<td>{{note}}</td>
+					</tr>
+				{{/each}}
+				</script>
+			</tbody>
+		</table>
+	</div>
+	
+	<script>
+		var ractive ;
+		window.onload = ShowHello;
+		function ShowHello(){
+			//console.log(data);
+			ractive = new Ractive({
+				target: '#target',
+				template: '#template',
+				data: {
+					item : {},
+					type: "xyft"
+				},
+				oncomplete:function(){
+					this._loadData(this.get("type"));
+				},
+				_loadData: function(type){
+					console.log(type);
+					var self = this;
+					$.ajax({
+						url:'http://localhost:3000/public?type=' + type,
+						type:'GET',
+						success: function(response){
+							self.set("item", JSON.parse(response))
+						}
+					});
+				},
+				searchdata : function(expect){
+					console.log(expect);
+					var self = this;
+					$.ajax({
+						url:'http://localhost:3000/public?expect=' + expect,
+						type:'GET',
+						success: function(response){
+							self.set("item", JSON.parse(response))
+						}
+					});
+				}
+			});
+		}
+		function changeType(select){
+			ractive._loadData($(select).val());
+		}
+		function search(){
+			ractive.searchdata(document.getElementById("search_expect").value);
+		}
+	</script>
+	
+</body>
+
+</html>

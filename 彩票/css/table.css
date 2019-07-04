@@ -1,0 +1,16 @@
+
+.table-bordered {
+    border: 1px solid #f4f4f4;
+}
+.table {
+    width: 80%;
+    max-width: 100%;
+	border-spacing: 1;
+    border-collapse: collapse;
+}
+
+td :hover{
+	border-spacing: 1;
+    border-collapse: collapse;
+	border:2px #cccccc solid;
+}
