@@ -64,6 +64,7 @@
 				template: '#template',
 				data: {
 					item : {},
+					expect : {},
 					type: "xyft"
 				},
 				oncomplete:function(){
@@ -79,17 +80,6 @@
 							self.set("item", JSON.parse(response))
 						}
 					});
-				},
-				searchdata : function(expect){
-					console.log(expect);
-					var self = this;
-					$.ajax({
-						url:'http://localhost:3000/public?expect=' + expect,
-						type:'GET',
-						success: function(response){
-							self.set("item", JSON.parse(response))
-						}
-					});
 				}
 			});
 		}
@@ -97,6 +87,7 @@
 			ractive._loadData($(select).val());
 		}
 		function search(){
+			console.log(document.getElementById("search_expect").value);
 			ractive.searchdata(document.getElementById("search_expect").value);
 		}
 	</script>
