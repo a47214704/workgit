@@ -1,0 +1,11 @@
+<?php
+//商户编号
+define('MEMBER_ID',10020);
+//接口密钥
+define('INTERFACE_KEY','e043fb66ee43b8d0f21936f41287d545');
+//支付方式，需要联系客服获取
+define('CHANNEL_ID',2);
+//跳转地址，一般H5支付不会跳转可填空
+define('REDIRECT_URL','');
+//回调地址
+define('NOTIFY_URL','');
