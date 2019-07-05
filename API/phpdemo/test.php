@@ -5,15 +5,14 @@
 	$mch_id	  = 10020;		// 商户号
 	$secretkey = 'e043fb66ee43b8d0f21936f41287d545';       // 密钥
 	$payurl = ;
-	$orderid = ;  // 订单号
-	$money = ;      // 总金额
-	$uid = ; 
-	$payType	= '';
+	$orderid = 'test123456';  // 订单号
+	$money = 5000;      // 总金额
+	//$uid = ; 
+	$payType	= 2;//付款方式
 	$message	= '下单失败，请重试！';
-	$qrcode		= '';
+	//$qrcode		= '';
 	$jump		= false;
-	$isvalue	= true;
-	$payType = ;
+	//$isvalue	= true;
 	
 	
 	//todo
@@ -26,10 +25,9 @@
 			"pay_orderid"     	  	=> $orderid,
 			"pay_applydate"			=> date("Y-m-d H:i:s"),
 			"pay_bankcode"			=> $payType[1],
-			//"pay_notifyurl"       	 => 'http://127.0.0.1/'.$paymentid.'/notify.php',
-			"pay_notifyurl"				  => 'http://23.101.5.11:9010/'.$paymentid.'/notify.php',
-			"pay_callbackurl" 			=> 'https://127.0.0.1.zhongfa169.com/return.php',
-			"pay_amount"                 => $money,
+			"pay_notifyurl"			=> 'http://23.101.5.11:9010/'.$paymentid.'/notify.php',
+			"pay_callbackurl" 		=> 'https://127.0.0.1.zhongfa169.com/return.php',
+			"pay_amount"            => $money,
 		);
 
 		ksort($post_data);
