@@ -1,0 +1,14 @@
+body
+{
+	font-family:"微軟正黑體",snas-serif;
+	line-height:1;
+	font-size:24px;
+	overflow-x: hidden;
+	padding:100px;
+}
+.label_style{
+	padding-left:20px;
+}
+.table tr{
+	padding-top:20px;
+}
