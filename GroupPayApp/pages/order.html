@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>GroupPay</title>
+    <script src="../js/jquery.1.5.2.js"></script>
+    <script src="../js/jquery-ui.1.81.js"></script>
+    <script src="../js/jquery.ui.touch-punch.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/mui.min.css"/>
+    <link rel="stylesheet" href="../css/own.css" />
+    <style>
+    	* { touch-action: pan-y; } 
+    	.own-btn-grey,
+        .own-btn-green {
+            width: 45%;
+            padding: 10px 0;
+            font-size: 15px;
+        }
+        
+        .table-title {
+            height: 43px;
+        }
+        
+        #rightarea {
+            position: fixed;
+            right: 10px;
+            top: 2%;
+            width: 10%;
+            z-index: 1000;
+        }
+        
+        #rirghtareapic {
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .menu-header {
+            position: fixed;
+            width: 100%;
+            top: 0%;
+            z-index: 10;
+            height: 130px;
+        }
+        
+        #mheader {
+            font-family: "微軟正黑體";
+            margin: 0%;
+            padding: 0%;
+        }
+        
+        .minfo {
+            padding-top: 5px;
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-bottom: 10px;
+        }
+        
+        .user-left {
+            margin-top: 8px;
+            width: 12%;
+            height: 92px;
+            float: left;
+        }
+        
+        #userpic {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .userpic_text {
+            font-size: 10px;
+            color: #FFFE9C;
+            text-align: center;
+        }
+        
+        .user-middle {
+            width: 44%;
+            padding-left: 5%;
+            height: 60px;
+            float: left;
+        }
+        
+        .user-right {
+            width: 44%;
+            padding-left: 0;
+            height: 60px;
+            float: left;
+        }
+        
+        .userinfo {
+            margin-top: 4px;
+            color: white;
+        }
+        
+        .userinfo_math {
+            color: white;
+        }
+        
+        #runtext {
+            width: 100%;
+            font-size: 14px;
+            clear: both;
+            margin-top: 5px;
+            padding-top: 2px;
+            padding-bottom: 5px;
+            color: white;
+            background: black;
+            height: 25px;
+        }
+        
+        #topbtn {
+            padding: 0%;
+            clear: both;
+        }
+        
+        #depositBtn {
+            margin: 0%;
+            float: left;
+            width: 45%;
+            height: 40px;
+            margin-left: 3.3%;
+        }
+        
+        #withdrawBtn {
+            float: right;
+            width: 45%;
+            height: 40px;
+            margin-right: 3.3%;
+        }
+        
+        #test {
+            height: 500px;
+        }
+        
+        #mbody {
+            margin-top: 140px;
+        }
+        .mui-table-view-cell {position: relative;}
+		h5 {padding:1px 0;}
+		h5 em {display: inline-block; width: 80px; font-style: normal;}
+		.focus {color: #333333; font-size: 16px;}
+		.mui-btn-block {padding:9px 15px; margin:0; font-size: 15px}
+		.select {border-bottom: 1px solid #c8c7cc; margin-bottom: 10px; position: relative;}
+		.mui-icon-arrowdown {position: absolute; right: 10px; top:8px; pointer-events: none;}
+    </style>
+</head>
+<body>
+	<div id="rightarea">
+        <img id="rirghtareapic" src="../img/ricon.png">
+    </div>
+	<header id="mheader" class="menu-header">
+		<div class="minfo">
+            <div class="user-middle">
+                <div class="userinfo">
+                    矿石（个）：
+                </div>
+                <div class="userinfo_math">
+                    <span id="balance">001<span>
+                </div>
+            </div>
+            <div class="user-right">                
+                <div class="userinfo">
+                    运输中（个）：
+                </div>
+                <div class="userinfo_math">
+                    <span id="balanceTransation">0<span>
+                </div>
+            </div>
+        </div>
+        <div id="topbtn" class="mui-button-row">
+            <button type="button" id="depositBtn" class="mui-btn own-btn-green">矿石卖出提醒</button>
+            <button type="button" id="withdrawBtn" class="mui-btn own-btn-grey">散矿买进提醒</button>
+        </div>
+        <marquee id="runtext" behavior="scroll" direction="left">test</marquee>
+	</header>
+	<body id="mbody">
+		<!--下拉刷新容器-->
+		<div id="pullrefresh" class="mui-content mui-scroll-wrapper">
+			<div class="select">
+				<select class="mui-btn mui-btn-block" id="selectBtn">
+					<option value="2">订单状态：已接受</option>
+					<option value="1">订单状态：等待中</option>
+					<option value="3">订单状态：已付款</option>
+					<option value="4">订单状态：已清算</option>
+					<option value="5">订单状态：已取消</option>
+				</select>
+				<span class="mui-icon mui-icon-arrowdown"></span>
+			</div>
+			<div class="mui-scroll" id="orderList"></div>
+		</div>
+	</body>
+	<script src="../js/mui.min.js" charset="UTF-8"></script>
+	<script type="text/javascript" src="../js/own.js" ></script>
+	<script src="../js/network.js"></script>
+	<script type="text/javascript" charset="UTF-8">
+		mui.init({
+			pullRefresh: {
+				container: '#pullrefresh',
+				down: {
+					style:'circle',
+					callback: pulldownRefresh
+				}
+			}
+		});
+		
+		var orderStatus = 2;
+		var selectBtn;
+		var orderList;
+		var orderId = 0;
+		var statusAr = ['等待中', '已接受', '已付款', '已清算', '已取消'];
+		var timer = null;
+		var serviceBtn;
+		var currentWebview;
+		var paddingBalance;
+		mui.plusReady(function() {		
+			selectBtn = document.getElementById("selectBtn");
+			orderList = document.getElementById("orderList");
+			paddingBalance = document.getElementById("balanceTransation");
+			//接收页面更新事件
+			window.addEventListener('refresh', function() {
+				selectBtn.options[0].selected = true;
+				orderStatus = 2;
+				pulldownRefresh();
+			}, false);
+			
+			selectBtn.addEventListener('change', function() {
+				orderStatus = this.value;
+				pulldownRefresh();
+			}, false);
+			
+			if (timer != null) {
+				clearInterval(timer);
+			}
+			
+			timer = setInterval(function() {
+				countDown();
+			}, 1000);
+			
+			$("#rightarea").draggable();
+			
+			currentWebView = plus.webview.currentWebview();
+			currentWebView.addEventListener('show', function() {
+				pulldownRefresh();
+			}, false);
+		});
+		
+		function countDown() {
+			mui('#orderList ul li').each(function(index, item) {
+				var second = parseInt(item.getAttribute("expired"));
+				if (second > 0) {
+					second --;
+					this.setAttribute('expired', second);
+					item.querySelector('.count-down').innerText = '倒计时：' + formatTime(second);
+				} else if(orderStatus == 2) {
+					this.parentNode.removeChild(this);
+				} else {
+					item.querySelector('.count-down').innerText = '';
+				}
+			});
+		}
+			
+		function pulldownRefresh() {
+			network.get_order_list(orderStatus);
+			network.get_marquee();
+			if (localStorage.getItem('user')) {
+				setUserInfo();
+			}
+		}
+		
+		function getOrderListSuccess(data) {
+			mui('#pullrefresh').pullRefresh().endPulldownToRefresh();
+			if (data.result.length > 0) {
+				setHtml(data.result);
+				addTap();
+			} else {
+				orderList.innerHTML = '';
+			}
+		}
+		
+		function setHtml(data) {
+			var html = '<ul class="mui-table-view my-table-view">';
+			mui.each(data, function(index, item) {
+				var expired = Math.ceil(parseInt(item.expiration) / 1000);
+				html += '<li class="mui-table-view-cell" oid="'+item.id+'" expired="'+expired+'">';
+				html += '<h5 class="focus">订单编号：'+item.id+'</h5>';
+				html += '<h5><em>'+item.channel+'</em><span class="txt-red">￥'+(parseInt(item.amount)/100)+'</span></h5>';
+				html += '<h5><em>'+statusAr[orderStatus - 1]+'</em><span class="txt-red count-down">';
+				if (expired > 0) {
+					html += '倒计时：' + formatTime(expired);
+				}
+				html += '</span></h5>';
+				
+				if (orderStatus == 2) {
+					html += '<span class="ctrl-field">';
+					html += '<a href="#" oid="'+item.id+'" amount="'+(parseInt(item.amount)/100)+'" class="ctrl-btn" onclick="accept(this)">同意</a>';
+					html += '</span>';	
+				}	
+				html += '</li>';
+			});
+			html += '</ul>';
+			orderList.innerHTML = html;
+		}
+		
+		function accept(payment){
+			var orderId = payment.getAttribute('oid');
+			var amount = payment.getAttribute('amount');
+			var btnArray = ['是', '否'];
+			mui.confirm('您将要支付 '+amount+' 元，是否确认付款？', '确认付款', btnArray, function(e) {
+				if (e.index == 0) {
+					network.order_settle(orderId);
+				}
+			});
+		}
+		
+		function orderSettleSuccess(data) {
+			if (data.error == 'object_not_found') {
+				mui.toast('订单状态已发生改变');
+			} else if(data.error == 'success') {
+				mui.toast('确认付款成功');
+				setUserInfo();
+			}
+			pulldownRefresh();
+		}
+		
+		function setUserInfo() {
+			var user = JSON.parse(localStorage.getItem('user'));	
+			if(user != null){
+				balance.innerText = user.balance;
+				paddingBalance.innerText = user.paddingBalance;
+				network.get_user_info(user.id);				
+			}			
+		}
+		
+		function userInfoSuccess(data) {
+			if (data.result) {
+				if (data.result.status != 1) {
+					localStorage.removeItem('user');
+					mui.toast('您的账号存在问题，请重新登陆');
+				} else {
+					var coin = data.result.balance;
+					coin = coin.toFixed(2);
+					var pendingCoin = data.result.pendingBalance/100;
+					pendingCoin = pendingCoin.toFixed(2);
+					
+					balance.innerText = coin;
+					paddingBalance.innerText = pendingCoin;
+					
+					var user = JSON.parse(localStorage.getItem('user'));
+					user.avatar = data.result.avatar;
+					user.balance = coin;
+					user.paddingBalance = pendingCoin;
+					user.promotionCode = data.result.promotionCode;
+					user.nickName = data.result.nickName;
+					user.status = data.result.status;
+					localStorage.setItem('user', JSON.stringify(user));
+				}
+			} else {
+				mui.toast('获取用户信息失败');
+			}
+		}
+		
+		function getMarqueeSuccess(data) {
+			if(data.error == "success"){
+				document.getElementById("runtext").innerHTML = data.result.value;
+			}
+		}
+	</script>
+</body>
+</html>

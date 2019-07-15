@@ -1,0 +1,125 @@
+body {
+	background: #EEEEF1; font-family: "微软雅黑"; font-size: 15px;
+}
+input[type="text"],
+input[type="password"] {
+	border-radius: 0; border-color: #999; font-size: 15px;
+}
+input[type="button"],
+button {
+	border-radius: 0!important;
+}
+.mui-bar {
+	background: #EEEEF1;
+}
+.mui-bar-tab .mui-icon {
+	 background-size: 100% 100% !important;
+}
+.mui-tab-label {
+	color: #AAAAAA;
+}
+.mui-active .mui-tab-label {
+	color: #00b82b;
+}
+.icon-home {
+	background: url("../img/home.png") no-repeat;
+}
+.mui-active .icon-home {
+	background: url("../img/home_active.png") no-repeat;
+}
+.icon-cash {
+	background: url("../img/cash.png") no-repeat;
+}
+.mui-active .icon-cash {
+	background: url("../img/cash_active.png") no-repeat;
+}
+.icon-share {
+	background: url(../img/share.png) no-repeat;
+}
+.mui-active .icon-share {
+	background: url(../img/share_active.png) no-repeat;
+}
+.icon-mine {
+	background: url(../img/me.png) no-repeat; width: 18px!important;
+}
+.mui-active .icon-mine {
+	background: url(../img/me_active.png) no-repeat;
+}
+.logo {
+	text-align: center;
+}
+.logo img {
+	width: 50%; padding-top: 30px; max-width: 350px;
+}
+.login-card {
+	padding:30px 15px 0 15px;
+}
+.own-btn-green {
+	background: #00b82b; border:none; color: #FFFFFF;
+}
+.own-btn-blue {
+	background: #5792ff; border: none; color: #FFFFFF;
+}
+.own-btn-grey {
+	background: #BBBBBB; border:none; color: #FFFFFF;
+}
+.captcha {
+	position: absolute; width: 100px; right: 0; background: #CCCCCC; height: 40px; top: 0;
+}
+.sms-btn {
+	width: 120px!important; position: absolute; right: 0; top: 0;
+	border: 0; background: #5792ff; color: #FFFFFF;
+}
+.menu-header {
+	background: #393939; padding: 20px;
+}
+.table-title {
+	font-weight: 700;
+}
+.txt-red {
+	color: #FF0000;
+}
+.ctrl-field {
+	position: absolute; right: 15px; top: 11px;
+}
+.ctrl-btn {
+	padding: 5px 15px; color: #FFFFFF; background: #00B82B; display: block; text-align: center;
+	margin:0 auto;
+}
+.red-btn {
+	background: #FF0000; margin-top:5px
+}
+.user-info {
+	background: #393939; padding: 20px 10px; position: relative;
+}
+.user-info .avatar {
+	width: 70px; height: 70px; border-radius: 50%; background:#FFFFFF; text-align: center;
+	line-height: 70px;
+}
+.profile {
+	position: absolute; left: 95px; top: 20px;
+}
+.profile p {
+	padding: 0; margin: 0;  color: #FFFFFF; line-height: 22px;
+}
+.own-bar-nav {
+	background: #393939; color: #FFFFFF; box-shadow:none;
+}
+.own-bar-nav a, .own-bar-nav .mui-title {
+	color: #FFFFFF;
+}
+.mui-input-row .row-label {
+	width: 100%;;
+}
+.mt-15 {
+	margin-top: 10px;
+}
+.mui-icon-plusempty {
+	font-weight: 700; 
+}
+#emptyCollect {
+	text-align: center; margin-top: 10px; color: #999; line-height: 2em;
+}
+#emptyCollect .mui-icon-plusempty {
+	font-size: 30px;
+}

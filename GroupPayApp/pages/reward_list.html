@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>Hello MUI</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<link rel="stylesheet" href="../css/own.css" />
+		<style>
+			.mui-table-view-cell {position: relative;}
+			h5 {padding:1px 0;}
+			h5 em {display: inline-block; width: 80px; font-style: normal;}
+			.focus {color: #333333; font-size: 16px;}
+			.mui-btn-block {padding:9px 15px; margin:0; font-size: 15px}
+			.select {border-bottom: 1px solid #c8c7cc; margin-bottom: 10px; position: relative;}
+			.mui-icon-arrowdown {position: absolute; right: 10px; top:8px; pointer-events: none;}
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav own-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">利润提现记录</h1>
+		</header>
+		<!--下拉刷新容器-->
+		<div id="pullrefresh" class="mui-content mui-scroll-wrapper">			
+			<div class="mui-scroll" id="rewardList"></div>
+		</div>
+		<script src="../js/mui.min.js"></script>
+		<script type="text/javascript" src="../js/own.js" ></script>
+		<script type="text/javascript" src="../js/network.js" ></script>
+		<script>
+			mui.init({
+				pullRefresh: {
+					container: '#pullrefresh',
+					down: {
+						style:'circle',
+						callback: pulldownRefresh
+					}
+				}
+			});
+			
+			var rewardList;
+			
+			mui.plusReady(function() {
+				currentWebView = plus.webview.currentWebview();
+				currentWebView.addEventListener('show', function() {
+					pulldownRefresh();
+				}, false);
+				//接收页面更新事件
+				window.addEventListener('refresh', function() {
+					pulldownRefresh();
+				}, false);
+				rewardList = document.getElementById('rewardList');
+			});
+			
+			function pulldownRefresh() {
+				var user = JSON.parse(localStorage.getItem('user'));
+				network.reward_commission_records(user.id);
+			}
+			
+			function getRewardListSuccess(data) {
+				mui('#pullrefresh').pullRefresh().endPulldownToRefresh();
+				if (data.result.length > 0) {
+					setHtml(data.result);
+				} else {
+					rewardList.innerHTML = '';
+				}
+			}
+			
+			function setHtml(data) {
+				var html = '<ul class="mui-table-view my-table-view">';
+				mui.each(data, function(index, item) {
+					var expired = Math.ceil(parseInt(item.expiration) / 1000);
+					html += '<li class="mui-table-view-cell">';
+					html += '<h5 class="focus">提现日期：'+item.week+'</h5>';
+					html += '<h5><em>金额</em><span class="txt-red">￥'+(parseInt(item.commission))+'</span></h5>';					
+					html += '</li>';
+				});
+				html += '</ul>';
+				rewardList.innerHTML = html;
+			}
+		</script>
+	</body>
+
+</html>

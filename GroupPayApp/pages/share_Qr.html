@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<title></title>
+	</head>
+	
+	<body>
+		<header class="mui-bar mui-bar-nav own-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">分享赚钱</h1>
+		</header>
+		<div style="height:45px"></div>
+		<div style="height:640px;background-image: url('../img/share_qr_bg.png');background-repeat: no-repeat;">
+			<div id="QrcodeImg" style="position: absolute;margin-left: 105px;margin-top: 290px;"></div>
+			<em style="position: absolute;width:160px;margin-left: 100px;margin-top: 450px;text-align: center;">
+				推荐人:
+				<font color="blueviolet" id="userId"></font>
+			</em>
+		</div>
+	</body>
+	<script src="../js/jquery.1.5.2.js"></script>
+	<script src="../js/mui.min.js" charset="UTF-8"></script>
+	<script src="../js/QRCode.js" charset="UTF-8"></script>
+	<script src="../js/QRCodeLib.js" charset="UTF-8"></script>
+	<script type="text/javascript" charset="UTF-8">
+		mui.init({
+		  	gestureConfig:{		   
+		   		longtap: true, //默认为false
+		  	}
+		});
+		
+		mui.plusReady(function(){
+			var self = plus.webview.currentWebview();
+			if(self.QrCode){
+				jQuery("#QrcodeImg").empty();
+				jQuery('#QrcodeImg').qrcode({
+					render	: "table",
+					text	: self.QrCode,
+					width	: 155,
+					height	: 155,
+				});
+			}
+			if(self.userId){
+				jQuery("#userId").html(self.userId);
+			}
+		});
+	</script>
+</html>

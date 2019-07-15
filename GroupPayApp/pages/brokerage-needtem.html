@@ -1,0 +1,346 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>收款管理</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<link href="../css/mui.min.css" rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" href="../css/own.css"/>
+	<style type="text/css">
+		dl, dl dt, dl dd {margin: 0; padding: 0; box-sizing: border-box;}
+		dl {display: block; border:1px solid #C0C0C0; text-align: center; font-size: 0;}
+		dl em {display: block; font-style: normal;}
+		dl dd {background:#FFFFFF; padding:10px 0; line-height: 25px; width: 50%; display: inline-block; font-size: 15px;}
+		dl dd.w100 {width: 100%;}
+		.bgb {background:#CCCCCC}
+		.br {border-right: 1px solid #C0C0C0;}
+		.tips {color: #EE0000; font-size: 12px; padding: 5px 0;}
+		.btn-double {width: 49%; position: absolute;}
+		.mui-button-row {padding:10px 0; min-height: 50px;}
+	</style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav own-bar-nav">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">我的利润</h1>
+	</header>
+	<div id="pullrefresh" class="mui-content" style="margin:10px;">
+		<dl>
+			<dd class="br w100 bgb">当天总业绩 <em id="totalRevenue">0.0</em></dd>
+			<dd class="br">当天直属业绩 <em id="selfRevenue">0.0</em></dd>
+			<dd class="br">当天代理业绩<em id="agentRevenue">0.0</em></dd>
+			<dd class="br bgb">当天直属利润<em id="selfCommission">0.0</em></dd>
+			<dd class="br bgb">当天代理利润<em id="agencyCommission">0.0</em></dd>
+			<dd class="br">尚未提领<em id="commissionBalance">0.0</em></dd>
+			<dd class="br">累计总利润<em id="historyComission">0.0</em></dd>	
+		</dl>
+		
+		<div class="mui-button-row">
+			<button type="button" class="mui-btn own-btn-green btn-double" style="left: 0;" onclick="rewardCommission()">提现</button>
+			<button type="button" class="mui-btn own-btn-green btn-double" style="right: 0;" onclick="rewardList()">提现详情</button>
+		</div>
+		
+		<div style="text-align: center;margin-top: 1px;border: 1px solid grey;" class="bgb">
+			当前每万业绩返<font id="balance">0</font>矿石<br>
+			您产生的业绩量达到<font id="nextBalanceCondition">0</font>即每万返<font id="nextBalance">0</font>元
+		</div>
+		
+		<div style="margin-top: 11px;border: 1px solid grey;" class="tips">
+			注：当天总业绩 = 当天直属业绩 + 当天代理业绩<br>
+			总利润 = 当天直属利润 + 当天代理利润
+		</div>
+		
+		<dl style="margin-top: 10px;">
+			<dd class="w100 bgb">支付宝当日卖矿<font id="aliPayRatio"></font></dd>
+			<dd class="br">业绩<em id="selfAliRevenue">0.0</em></dd>
+			<dd>利润<em id="selfAliCommission">0.0</em></dd>
+		</dl>
+		
+		<dl>
+			<dd class="w100 bgb">微信当日卖矿<font id="wechatPayRatio"></font></dd>
+			<dd class="br">业绩<em id="selfWechatRevenue">0.0</em></dd>
+			<dd>利润<em id="selfWechatCommission">0.0</em></dd>
+		</dl>
+		
+		<dl>
+			<dd class="w100 bgb">银行卡当日卖矿 <font id="bankPayRatio"></font></dd>
+			<dd class="br">业绩<em id="selfBankRevenue">0.0</em></dd>
+			<dd>利润<em id="selfBankCommission">0.0</em></dd>
+		</dl>
+		
+		<div class="mui-button-row">
+			<button type="button" class="mui-btn own-btn-green mui-btn-block" style="padding: 5px 0px;" onclick="ChildUser(false)">会员详情</button>
+		</div>
+		<dl>
+            <dd class="w100 bgb">我的下级会员<font id="totalDirectMembers"></font>人</dd>
+            <dd class="br">本周新增<font id="directMembersWeekIncrement"></font>人</dd>
+            <dd>本月新增<font id="directMembersMonthIncrement"></font>人</dd>
+		</dl>
+		<dl>
+			<dd class="w100 bgb">我的下级代理<font id="totalDirectAgents"></font>人</dd>
+			<dd class="br">本周新增<font id="directAgentsWeekIncrement"></font>人</dd>
+			<dd>本月新增<font id="directAgentsMonthIncrement"></font>人</dd>
+		</dl>
+		<div class="mui-button-row">
+			<button type="button" class="mui-btn own-btn-green mui-btn-block" style="padding: 5px 0px;" onclick="ChildUser(true)">代理详情</button>
+		</div>
+	</div>
+	
+	<script src="../js/mui.min.js"></script>
+	<script type="text/javascript" src="../js/own.js" ></script>
+	<script type="text/javascript" src="../js/network.js" ></script>
+	<script type="text/javascript">
+		mui.init({
+			swipeBack:true,
+			pullRefresh: {
+				container: '#pullrefresh',
+				down: {
+					style:'circle',
+					callback: setUserTeam
+				}
+			}
+		});
+		var directMembersWeekIncrement,
+			directMembersMonthIncrement,
+			directAgentsWeekIncrement,
+			directAgentsMonthIncrement,
+			totalDirectMembers,
+			totalDirectAgents,
+			totalRevenue,
+			selfRevenue,
+			agentRevenue,
+			selfCommission,
+			agencyCommission,
+			commissionBalance,
+			historyComission,
+			
+			selfAliRevenue,
+			selfWechatRevenue,
+			selfBankRevenue,
+			selfAliCommission,
+			selfWechatCommission,
+			selfBankCommission;
+		
+		var balanceRank = [],
+		teamRevenue = 0
+		selfTodayCommission = 0,
+		agentTodayCommission = 0;
+		
+		var loadingWorks = 0;
+		var currentWebView;
+		
+		mui.plusReady(function(){
+			currentWebView = plus.webview.currentWebview();
+			
+			//设置用户信息
+			if (localStorage.getItem('user')) {
+				setUserTeam();
+			}
+			
+			currentWebView.addEventListener('show', function() {
+				setUserTeam();
+			}, false);
+			
+			directMembersWeekIncrement = document.getElementById('directMembersWeekIncrement');
+			directMembersMonthIncrement = document.getElementById('directMembersMonthIncrement');
+			directAgentsWeekIncrement = document.getElementById('directAgentsWeekIncrement');
+			directAgentsMonthIncrement = document.getElementById('directAgentsMonthIncrement');
+			totalDirectMembers = document.getElementById('totalDirectMembers');
+			totalDirectAgents = document.getElementById('totalDirectAgents');			
+			totalRevenue = document.getElementById('totalRevenue');
+			selfRevenue = document.getElementById('selfRevenue');
+			agentRevenue = document.getElementById('agentRevenue');
+			selfCommission = document.getElementById('selfCommission');
+			agencyCommission = document.getElementById('agencyCommission');
+			commissionBalance = document.getElementById('commissionBalance');
+			historyComission = document.getElementById('historyComission');
+			selfAliRevenue = document.getElementById('selfAliRevenue');
+			selfWechatRevenue = document.getElementById('selfWechatRevenue');
+			selfBankRevenue = document.getElementById('selfBankRevenue');
+			selfAliCommission = document.getElementById('selfAliCommission');
+			selfWechatCommission = document.getElementById('selfWechatCommission');
+			selfBankCommission = document.getElementById('selfBankCommission');
+		});
+		
+		function rewardList(){
+			mui.openWindow({  
+			    url:'reward_list.html',  
+			    id:'reward_list.html'
+			});
+		}
+		
+		function rewardCommission(){
+			var user = JSON.parse(localStorage.getItem('user'));
+			network.reward_commission(user.id);
+		}
+		
+		function rewardCommissionSuccess(data){			
+			if(data.error == "success"){
+				mui.toast('提现利润成功');	
+				setUserTeam();				
+			}else{
+				mui.toast('提现利润失败');
+			}
+		}
+		
+		function ChildUser(isAgent) {
+			mui.openWindow({  
+			    url:'userList.html',  
+			    id:'userList.html',  
+			    extras:{  
+			        isAgent: isAgent
+			    }  
+			});
+		}
+		
+		function setUserTeam() {
+			var user = JSON.parse(localStorage.getItem('user'));
+			loadingWorks = 3;
+			network.get_team_info(user.id);			
+			network.get_revenue(user.id);			
+			network.get_balanceRank();
+			network.collect_ratio();
+		}
+		
+		function getBalance(){
+			var user = JSON.parse(localStorage.getItem('user'));
+			network.get_balance(user.id);
+		}
+		
+		function teamInfoSuccess(data) {
+			directMembersWeekIncrement.innerHTML = 0;
+			directMembersMonthIncrement.innerHTML = 0;
+			directAgentsWeekIncrement.innerHTML = 0;
+			directAgentsMonthIncrement.innerHTML = 0;
+			totalDirectMembers.innerHTML = 0;
+			totalDirectAgents.innerHTML = 0;
+			if(data.error == "success"){				
+				if(data.result.total > 0){
+					directMembersWeekIncrement.innerHTML = data.result.directMembers.thisWeekIncrement
+					directMembersMonthIncrement.innerHTML = data.result.directMembers.thisMonthIncrement
+					directAgentsWeekIncrement.innerHTML = data.result.directAgents.thisWeekIncrement
+					directAgentsMonthIncrement.innerHTML = data.result.directAgents.thisMonthIncrement
+					totalDirectMembers.innerHTML = data.result.directMembers.total;
+					totalDirectAgents.innerHTML = data.result.directAgents.total
+				}				
+			} else {
+				mui.toast('获取团队信息失败');
+			}	
+			loadingWorks--;
+			if(loadingWorks == 0){
+				mui('#pullrefresh').pullRefresh().endPulldownToRefresh();
+			}
+		}
+		
+		function getRevenueSuccess(data){
+			totalRevenue.innerHTML = 0;
+			selfRevenue.innerHTML = 0;
+			selfCommission.innerHTML = 0;
+			agentRevenue.innerHTML = 0;
+			agencyCommission.innerHTML = 0;
+			
+			selfAliRevenue.innerHTML = 0;
+			selfAliCommission.innerHTML = 0;
+			
+			selfWechatRevenue.innerHTML = 0;
+			selfWechatCommission.innerHTML = 0;
+			
+			selfBankRevenue.innerHTML = 0;
+			selfBankCommission.innerHTML = 0;
+			if(data.error == "success"){	
+				selfTodayCommission = Math.floor(data.result.selfCommission);
+				agentTodayCommission = Math.floor(data.result.agentRevenue * data.result.rankRatio - data.result.agencyCommission);
+				teamRevenue = Math.floor(data.result.totalRevenue);
+				
+				totalRevenue.innerHTML = teamRevenue;
+				selfRevenue.innerHTML = Math.floor(data.result.selfRevenue);
+				agentRevenue.innerHTML = Math.floor(data.result.agentRevenue);
+				
+				selfCommission.innerHTML = selfTodayCommission;
+				agencyCommission.innerHTML = agentTodayCommission;
+				
+				selfAliRevenue.innerHTML = Math.floor(data.result.selfAliRevenue);
+				selfAliCommission.innerHTML = Math.floor(data.result.selfAliCommission);
+				selfWechatRevenue.innerHTML = Math.floor(data.result.selfWechatRevenue);
+				selfWechatCommission.innerHTML = Math.floor(data.result.selfWechatCommission);
+				selfBankRevenue.innerHTML = Math.floor(data.result.selfBankRevenue);
+				selfBankCommission.innerHTML = Math.floor(data.result.selfBankCommission);
+				
+				getBalance();
+			} else {
+				mui.toast('获取业绩信息失败');
+			}		
+			loadingWorks--;
+			if(loadingWorks == 0){
+				mui('#pullrefresh').pullRefresh().endPulldownToRefresh();
+				setCurrectBalanceRank();
+			}
+		}
+		
+		function getBalanceSuccess(data){
+			commissionBalance.innerHTML = 0;
+			historyComission.innerHTML = 0;
+			if(data.error == "success"){
+				commissionBalance.innerHTML = Math.floor(data.result.commission);
+				historyComission.innerHTML = Math.floor(selfTodayCommission + agentTodayCommission);
+			} else {
+				mui.toast('获取佣金信息失败');
+			}				
+			mui('#pullrefresh').pullRefresh().endPulldownToRefresh();
+		}
+		
+		function getBalanceRankSuccess(data){			
+			if(data.error == "success"){		
+				balanceRank = data.result;
+			} else {
+				mui.toast('获取佣金等级信息失败');
+			}	
+			loadingWorks--;
+			if(loadingWorks == 0){
+				mui('#pullrefresh').pullRefresh().endPulldownToRefresh();
+				setCurrectBalanceRank();
+			}
+		}
+		
+		function getCollectRatioSuccess(data){
+			if(data.error == "success"){		
+				mui.each(data.result, function(index, item) {
+					switch(item.channelProvider){
+						case 1:
+							document.getElementById('wechatPayRatio').innerHTML = "0." + item.ratio + "%";
+							break;
+						case 2:
+							document.getElementById('aliPayRatio').innerHTML = "0." + item.ratio + "%";
+							break;
+						case 3:
+							document.getElementById('bankPayRatio').innerHTML = "0." + item.ratio + "%";
+							break;
+					}
+				});				
+			} else {
+				mui.toast('获取收款利率信息失败');
+			}	
+		}
+		
+		function setCurrectBalanceRank(){
+			var perBalance = 0;
+			var nextRank = "0";
+			var nextPerBalance = 0;
+			for(var i=0;i<balanceRank.length;i++){
+				var rank = balanceRank[i];
+				if(teamRevenue < rank.lowerBound){
+					nextRank = rank.lowerBound;
+					nextPerBalance = rank.ratio * 10;
+					break;					
+				}
+				if(teamRevenue >= rank.lowerBound){
+					perBalance = rank.ratio * 10;
+				}
+			}
+			document.getElementById('balance').innerHTML = perBalance;
+			document.getElementById('nextBalanceCondition').innerHTML = nextRank;
+			document.getElementById('nextBalance').innerHTML = nextPerBalance;
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>GroupPay</title>
+    <link href="css/mui.min.css" rel="stylesheet"/>
+    <link href="css/own.css" rel="stylesheet"/>
+</head>
+<body>
+	<nav class="mui-bar mui-bar-tab">
+	    <a class="mui-tab-item mui-active" id="0">
+	        <span class="mui-icon icon-home"></span>
+	        <span class="mui-tab-label">出售大厅</span>
+	    </a>
+	    <a class="mui-tab-item" id="1">
+	        <span class="mui-icon icon-cash"></span>
+	        <span class="mui-tab-label">发放中心</span>
+	    </a>
+	    <a class="mui-tab-item" id="2">
+	        <span class="mui-icon icon-share"></span>
+	        <span class="mui-tab-label">分享赚钱</span>
+	    </a>
+	    <a class="mui-tab-item" id="3">
+	        <span class="mui-icon icon-mine"></span>
+	        <span class="mui-tab-label">我的</span>
+	    </a>
+	</nav>
+	
+	<script src="js/mui.min.js"></script>
+	<script src="js/update.js"></script>
+	<script src="js/load.js"></script>
+	<script type="text/javascript" charset="utf-8">
+      	mui.init({
+			swipeBack: false
+		});
+		var mainWebView;
+		var curTabItem;
+		//父子模版页面
+		var headerWebView;
+		var contentWebView;
+		
+		var barItemUrl = ['pages/home.html', 'pages/order.html', 'pages/share.html', 'pages/mine.html'];
+		var barItemWebView = {};
+		
+		mui.plusReady(function() {
+			mainWebView = plus.webview.currentWebview();
+			//创建父子模版类
+			initParentChildTemplate();
+			//接收自定义的事件页面切换
+			changeWebViewEvent();
+			startProgessLoad();
+			initUpdate(preinit);			
+		});
+		
+		function preinit(){
+			endLoad();
+			if (!localStorage.getItem('user')) {
+				mui.fire(mainWebView,'newWebView',{
+					id:'pages/login.html',
+					href:'pages/login.html',
+					aniShow:false,
+				});
+				
+				setTimeout(function() {
+					init();
+				}, 500);
+			} else {
+				var user = JSON.parse(localStorage.getItem('user'));
+				if (user.security == 0) {
+					mui.fire(mainWebView,'newWebView',{
+						id:'pages/security-question.html',
+						href:'pages/security-question.html',
+						aniShow:false,
+					});
+					
+					mui.toast('为了您的账号安全，请设置密保信息');
+					
+					setTimeout(function() {
+						init();
+					}, 500);
+				} else {
+					init();
+				}
+			}
+		}
+		
+		//预处理
+		function init() {
+			//初始化主页面
+			initTabitemWebviews();
+			addEventForTabitem();
+			//关闭启动界面
+			closeStartScreen();
+			
+			window.addEventListener('settleTips', function() {
+				settleTips();
+			}, false);
+		}
+		
+		//关闭启动页面
+		function closeStartScreen(){
+			//创建父子模版完成后关闭启动页面
+			plus.device.setWakelock( true );
+			plus.navigator.setStatusBarBackground('#393939');
+			plus.navigator.closeSplashscreen();
+		}
+		
+		function initTabitemWebviews() {
+			for (var i = 0; i < barItemUrl.length; i++) {
+				barItemWebView[i] = mui.preload({
+					url: barItemUrl[i],
+					id: barItemUrl[i],
+					styles: {
+						top: '0px',
+						bottom: '52px',
+						left: '0px',
+						bounce: 'vertical',
+						bounceBackground: '#EEEEF1'
+					},
+					waiting: {
+		   				autoShow: false
+		   			}
+				});
+				
+				barItemWebView[i].hide();
+				mainWebView.append(barItemWebView[i]);
+			}
+			curTabItem = barItemWebView[0];
+			barItemWebView[0].show();
+		}
+		
+		function addEventForTabitem() {
+			mui('.mui-bar-tab').on('tap', '.mui-tab-item', function() {
+				var index = this.getAttribute('id');
+				if (barItemWebView[index] == curTabItem) {
+					return;
+				}
+				
+				barItemWebView[index].show();
+				curTabItem.hide();
+				curTabItem = barItemWebView[index];
+			});
+		}
+		
+		//初始化父子模版函数
+		function initParentChildTemplate() {
+			headerWebView = mui.preload({
+				url: 'template-main.html',
+				id: 'template-main.html',
+				styles: {
+					top:'0px',
+					bottom:'0px'
+				},
+				extras: {
+					mtype: 'main'
+				}
+			});
+			contentWebView = mui.preload({
+				url: '',
+				id: 'template-sub.html',
+				styles: {
+					top: '0px',
+					bottom: '0px',
+					bounce: 'vertical',
+					bounceBackground:'#EEEEF1'
+				},
+				extras: {
+					mtype: 'sub'
+				}
+			});
+			contentWebView.hide();
+			headerWebView.hide();
+			contentWebView.addEventListener('loaded', function() {
+				contentWebView.show();
+			}, false);
+			headerWebView.addEventListener('hide', function() {
+				contentWebView.hide();
+			}, false);
+			headerWebView.append(contentWebView);
+		}
+		
+		//添加监听事件
+		function changeWebViewEvent() {
+			window.addEventListener('newWebView', function(options) {				
+				var id = options.detail.id;
+				var href = options.detail.href;
+				var aniShow = options.detail.aniShow;
+				
+				if (id == 'pages/login.html') {
+					var loginWebView = plus.webview.getWebviewById(id);
+					if (loginWebView) {
+						loginWebView.show(aniShow);
+					}else {
+						//这个条件下面是为了适应当登录页面并没有初始化，或者初始化之后用户又已经登录了这个页面被删除之后再次登录
+						loginWebView = mui.preload({
+							url:'pages/login.html',
+							id:'pages/login.html',
+							styles:{
+								top:'0px',
+								bottom:'0px'
+							}
+						});
+						loginWebView.addEventListener('loaded',function(){
+							loginWebView.show(aniShow);
+						},false);
+					}
+				} else if (~id.indexOf('.html')) {
+					if (!~id.indexOf('needtem.html')) {
+						mui.openWindow({
+							url:href,
+							id:id,
+							styles:{
+								popGesture:'close'
+							},
+							show:{
+								aniShow:aniShow
+							},
+							waiting:{
+								autoShow:false
+							}
+						});
+					}else {
+						contentWebView.hide();
+						//向template-main传送事件
+						mui.fire(headerWebView,'templateFire',{
+							id:id,
+		   					aniShow: aniShow,
+		   					target: href
+						});
+					}
+				}
+			}, false);
+		}
+		
+		var alert = false;
+		function settleTips() {
+			if (!alert && curTabItem.id != 'pages/order.html') {
+				alert = true;
+				var btnArray = ['是', '否'];
+				mui.confirm('您有可结算的订单，前去处理？', '结算提示', btnArray, function(e) {
+					if (e.index == 0) {
+						var targetTab = document.getElementById("1");
+						mui.trigger(targetTab, 'tap');
+						var current = document.querySelector(".mui-bar-tab>.mui-tab-item.mui-active");
+					    current.classList.remove('mui-active');
+					    targetTab.classList.add('mui-active');
+					}
+					alert = false;
+				})
+			}
+		}
+		
+		//两次点击返回
+		var first = null;
+		mui.back = function(){
+			//首次按键
+			if (!first) {
+				first = new Date().getTime();
+				mui.toast("再按一次退出");
+				setTimeout(function(){
+					first = null;
+				},1000);
+			}else {
+				if (new Date().getTime() - first < 1000) {
+					plus.runtime.quit();
+				}
+			}
+		}
+    </script>
+</body>
+</html>

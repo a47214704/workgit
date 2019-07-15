@@ -1,0 +1,125 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Register</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<link href="../css/mui.min.css" rel="stylesheet" />
+	<link rel="stylesheet" href="../css/own.css" />
+</head>
+<body>
+	<div class="mui-content">
+		<div class="logo">
+			<img src="../img/logo.png" />
+		</div>
+		<div class="login-card">
+			<div class="mui-input-row">
+				<input type="text" value="" id="account" placeholder="请输入手机号" />
+			</div>
+			<div class="mui-input-row">
+				<input type="password" value="" id="password" placeholder="请输入密码" />
+			</div>
+			<div class="mui-input-row">
+				<input type="password" value="" id="confirmPwd" placeholder="确认密码" />
+			</div>
+			<!--
+			<div class="mui-input-row" style="padding-right: 130px;">
+				<input type="text" value="" id="captcha" placeholder="验证码" />
+				<button id="smsBtn" class="mui-btn mui-btn-block sms-btn">获取验证码</button>
+			</div>
+			-->
+			<div class="mui-input-row" style="padding-right: 110px;">
+				<input type="text" value="" id="captcha" placeholder="验证码" />
+				<img src="" class="captcha" id="captchaImg"/>
+			</div>
+		</div>
+		<div class="mui-button-row" style="margin: 3px 15px;">
+			<button id="regBtn" type="button" class="mui-btn own-btn-green mui-btn-block " style="padding: 5px 0px;">注册</button>
+		</div>
+		<div class="mui-button-row" style="margin: 3px 15px;">
+			<button id="loginBtn" type="button" class="mui-btn own-btn-blue mui-btn-block " style="padding: 5px 0px;">登录</button>
+		</div>
+	</div>
+	
+	<script src="../js/mui.min.js"></script>
+	<script type="text/javascript" src="../js/own.js" ></script>
+	<script type="text/javascript" src="../js/network.js" ></script>
+	<script type="text/javascript">
+		mui.init({
+			swipeBack: false
+		});
+		
+		var register;
+		var login;
+		var account;
+		var password;
+		var confirmPwd;
+		var captcha;
+		var captchaImg;
+		var currentWebview;
+		
+		mui.plusReady(function(){
+			currentWebview = plus.webview.currentWebview();
+			login 		= document.getElementById('loginBtn');
+			register 	= document.getElementById('regBtn');
+			account		= document.getElementById("account");
+			password	= document.getElementById("password");
+			confirmPwd	= document.getElementById("confirmPwd");
+			captcha		= document.getElementById("captcha");
+			captchaImg	= document.getElementById("captchaImg");
+			
+			captchaImg.setAttribute("src", network.captcha_url());
+			currentWebview.addEventListener('show', function(){
+				captchaImg.src = network.captcha_url() + '&r=' + Math.random();
+			}, false);
+			
+			//验证码刷新
+			captchaImg.addEventListener('tap', function () {
+				captchaImg.src = network.captcha_url() + '&r=' + Math.random();
+			}, false);
+			
+			//注册
+			register.addEventListener('tap', function() {
+				if (account.value.length <= 0 || !isMobleFormat(account.value)) {
+					mui.toast('请输入正确的手机号码');
+					return;
+				}
+				if (password.value.length <= 0){
+					mui.toast('请输入密码');
+					return;
+				}
+				if (confirmPwd.value.length <= 0 || password.value != confirmPwd.value){
+					mui.toast('两次输入密码必须一致');
+					return;
+				}
+				if (captcha.value.length <= 0) {
+					mui.toast('请输入验证码');
+					return;
+				}
+				
+				network.register({
+					captcha: captcha.value,
+					account: account.value,
+					password: password.value,
+				});
+			});
+			
+			login.addEventListener('tap',function(){
+				mui.back();
+			});
+		});
+		
+		function registerSuccess(data) {
+			mui.toast('账号注册成功，请登录');
+			mui.back();
+		}
+		
+		var old_back = mui.back;  
+		mui.back = function() {  
+		    var loginwv = plus.webview.getWebviewById("pages/login.html");
+		    mui.fire(loginwv,'refreshCaptch',{});
+		    old_back();
+		}
+	</script>
+</body>
+</html>

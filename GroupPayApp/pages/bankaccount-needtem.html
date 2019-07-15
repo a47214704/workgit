@@ -1,0 +1,184 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>收款管理</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<link href="../css/mui.min.css" rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" href="../css/own.css"/>
+	<style type="text/css">
+		#collectList p {font-size: 15px;line-height: 1.6;}
+		.qrcode {display: block; width: 80px; height: 80px; border: 1px solid #EEEEEE;}
+		.info {padding-left: 95px;}
+		.info h4 {padding-bottom: 5px;}
+		.mui-icon-closeempty {position: absolute; right: 10px; top: 10px; font-size: 30px; font-weight: 700; color: #00B82B;}
+	</style>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav own-bar-nav">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">收款管理</h1>
+		<a id="rightBar" class="mui-icon mui-icon-plusempty mui-pull-right"></a>
+	</header>
+	
+	<div class="mui-content">
+		<div id="emptyCollect" style="display: none;">
+			<span>空空如也</span>
+			<br />
+			<span>先添加一个收款方式吧</span>
+			<br />
+			<button type="button" class="mui-btn">
+				<span class="mui-icon mui-icon-plusempty" style="color: gray;"></span>
+			</button>
+		</div>
+		<ul id="collectList" class="mui-table-view"></ul>
+	</div>
+	
+	<script src="../js/mui.min.js"></script>
+	<script type="text/javascript" src="../js/own.js" ></script>
+	<script type="text/javascript" src="../js/network.js" ></script>
+	<script type="text/javascript">
+		mui.init({
+			swipeBack:true
+		});
+		
+		var collectWebview;
+		var rightBar;
+		var emptyBtn;
+		var emptyCollect;
+		var collectList;
+		var deleteCid = 0;
+		var currentWebview;
+		
+		mui.plusReady(function(){
+			currentWebview = plus.webview.currentWebview();
+			emptyCollect = document.getElementById("emptyCollect");
+			emptyBtn = emptyCollect.querySelector('button');
+			rightBar = document.getElementById("rightBar");
+			collectList = document.getElementById("collectList");
+			
+			collectWebview = mui.preload({
+				url:'collect-instrument.html',
+				id:'collect-instrument.html',
+				styles:{
+					top:'0px',
+					bottom:'0px'
+				}
+			});
+			
+			closeChildWebviewOfhide(currentWebview, collectWebview.id);
+			
+			rightBar.addEventListener('tap', function() {
+				addCollectInstrument();
+			}, false);
+			
+			currentWebview.addEventListener('show', function(){
+				network.get_collect_instrument();			
+			},false);
+			
+			collectWebview.addEventListener('hide', function(){
+				network.get_collect_instrument();
+			},false);
+			network.get_collect_instrument();	
+		});
+		
+		function getCollectInstrumentSuccess(data) {
+			var lists = data.result;
+			if (lists.length <= 0) {
+				emptyCollect.style.display = 'block';
+				collectList.style.display = 'none';
+				emptyBtn.addEventListener('tap',function(){
+					addCollectInstrument();
+				},false);
+			} else {
+				emptyCollect.style.display = 'none';
+				collectList.style.display = 'block';
+				setHtml(lists);
+				addTap();
+			}
+		}
+		
+		function setHtml(data) {
+			var html = '';
+			mui.each(data, function(index, item) {
+				html += '<li class="mui-table-view-cell" cid="'+item.id+'">';
+				if (item.qrCode) {
+					html += '<img src="'+ item.qrCode +'" class="mui-pull-left qrcode" />';
+					html += '<div class="info">';
+					html += '<h4>' +(item.accountHolder ? item.accountHolder : '--')+'('+item.dailyTotal + '/' + item.dailyLimit + ')</h4>';
+					html += '<p>' +(item.accountName ? item.accountName : '--')+ '</p>';
+					html += '<p>' +item.channel.name+ '</p></div>';
+				} else {
+					html += '<h4>' +item.accountHolder+'('+item.dailyTotal + '/' + item.dailyLimit + ')</h4>';
+					html += '<p>' +item.accountProvider+ '</p>';
+					html += '<p>' +item.accountName+ '</p>';
+				}
+				
+				html += '<span class="mui-icon mui-icon-closeempty" cid="'+item.id+'"></span></li>';
+			});
+			
+			collectList.innerHTML = html;
+		}
+		
+		function addTap() {
+			mui('.mui-table-view-cell').off('tap');
+			mui('.mui-table-view-cell').on('tap', '.mui-icon-closeempty', function(){
+				var cid = this.getAttribute('cid');
+				var btnArray = ['是', '否'];
+				mui.confirm('确认删除该收款方式吗？', '删除确认', btnArray, function(e) {
+					if (e.index == 0) {
+						deleteCid = cid;
+						network.del_collect_instrument({id:cid});
+					}
+				})
+			});
+		}
+		
+		function delCollectInstrumentSuccess(data) {
+			if (deleteCid != 0) {
+				var listCount = 0;
+				mui('#collectList li').each(function(index, item) {
+					if (item.getAttribute('cid') == deleteCid) {
+						collectList.removeChild(item);
+					} else {
+						listCount += 1;
+					}
+				});
+				deleteCid = 0;
+				
+				if (listCount == 0) {
+					emptyCollect.style.display = 'block';
+					collectList.style.display = 'none';
+				}
+			}
+			
+			mui.toast('删除成功');
+		}
+		
+		function addCollectInstrument(){
+			var aniShow = getaniShow();
+			//第二次进来的时候不会进plusReady
+			if (!collectWebview.getURL() || !collectWebview) {
+				collectWebview = mui.preload({
+					url:'collect-instrument.html',
+					id:'collect-instrument.html',
+					styles:{
+						top:'0px',
+						bottom:'0px'
+					}
+				});
+				
+				collectWebview.addEventListener('loaded',function(){
+					collectWebview.show(aniShow);
+				},false);
+				
+				collectWebview.addEventListener('hide', function(){
+					network.get_collect_instrument();			
+				},false);
+			}else {
+				collectWebview.show(aniShow);
+			}
+		}
+	</script>
+</body>
+</html>

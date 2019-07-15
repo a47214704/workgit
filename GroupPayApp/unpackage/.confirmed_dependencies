@@ -1,0 +1,90 @@
+{
+	"index.html": {
+		"resources": [
+			"pages/home.html",
+			"pages/share.html",
+			"css/own.css",
+			"css/mui.min.css",
+			"pages/order.html"
+		],
+		"refer": [
+			"pages/share.html",
+			"template-main.html",
+			"pages/mine.html",
+			"pages/home.html",
+			"pages/cash.html",
+			"pages/login.html",
+			"pages/register-needtem.html",
+			"pages/bank-manager-needtem.html",
+			"pages/security_question_needtem.html",
+			"pages/security-question-needtem.html",
+			"pages/security-question.html",
+			"pages/register.html",
+			"pages/changepsd-needtem.html",
+			"pages/bankaccount-needtem.html",
+			"pages/order.html",
+			"pages/brokerage-needtem.html"
+		]
+	},
+	"pages/home.html": {
+		"resources": [
+			"pages/order_list.html",
+			"css/own.css",
+			"css/mui.min.css"
+		],
+		"refer": [
+			"pages/order_list.html"
+		]
+	},
+	"pages/share.html": {
+		"resources": [
+			"css/own.css",
+			"css/mui.min.css"
+		],
+		"refer": [
+			"pages/share_Qr.html"
+		]
+	},
+	"template-main.html": {
+		"resources": [
+			"css/mui.min.css"
+		]
+	},
+	"pages/mine.html": {
+		"resources": [
+			"css/own.css",
+			"css/mui.min.css"
+		]
+	},
+	"pages/cash.html": {
+		"resources": [
+			"css/own.css",
+			"css/mui.min.css"
+		]
+	},
+	"pages/order_list.html": {
+		"resources": [
+			"css/own.css",
+			"css/mui.min.css"
+		]
+	},
+	"pages/bankaccount-needtem.html": {
+		"refer": [
+			"pages/collect-instrument.html"
+		]
+	},
+	"pages/order.html": {
+		"resources": [
+			"pages/order_list.html"
+		],
+		"refer": [
+			"pages/order_list.html"
+		]
+	},
+	"pages/brokerage-needtem.html": {
+		"refer": [
+			"pages/userList.html",
+			"pages/reward_list.html"
+		]
+	}
+}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<title></title>
+	</head>
+	
+	<body>
+		<header class="mui-bar mui-bar-nav own-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">网路测试</h1>
+		</header>
+		<div style="margin-top:200px">
+			<h3>请截图后联系客服</h3>
+			<div id="result"></div>
+		</div>		
+	</body>
+	<script src="../js/jquery.1.5.2.js"></script>
+	<script src="../js/mui.min.js" charset="UTF-8"></script>
+	<script src="../js/network.js"></script>
+	<script type="text/javascript" charset="UTF-8">
+		mui.init({
+		  	gestureConfig:{		   
+		   		longtap: false, //默认为false
+		  	}
+		});
+		
+		mui.plusReady(function(){
+			network.networkTest();
+		});
+		
+		function networkTestSucess(data){
+			jQuery("#result").html(data);
+		}
+	</script>
+</html>
