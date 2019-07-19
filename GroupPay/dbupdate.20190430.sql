@@ -1,0 +1,1 @@
+﻿insert into collect_channel(`name`, `daily_limit`, `expiry_limit`, `type`) values('云闪付', '0', '0', 4);

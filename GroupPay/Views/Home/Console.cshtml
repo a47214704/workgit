@@ -1,0 +1,143 @@
+﻿@model GroupPay.Models.UserAccount
+
+<partial name="_ConsoleHeader" />
+
+<div class="content" id="target"></div>
+<script id="ractiveTemplate" type="text/reactive">
+    <div class="search-row">
+        <label>时间：</label>
+        <input type="text" name="startDate" id="startDate" value="{{startDate}}" />
+        <input type="text" name="startTime" id="startTime" value="{{startTime}}" />
+        <label>至　</label>
+        <input type="text" name="endDate" id="endDate" value="{{endDate}}" />
+        <input type="text" name="endTime" id="endTime" value="{{endTime}}" />
+        <input type="submit" name="searchBtn" value="确定" on-click="doSearch" />
+        {{#if info}}
+        <input type="button" name="order" id="order" value="申请下發" on-click="addorder" />
+        {{/if}}
+    </div>
+    <div style="color:blue;padding:0 0 10px 0;">{{message}}</div>
+    <table class="listTable">
+        <thead>
+        <th>通道类型</th>
+        <th>订单总数</th>
+        <th>支付成功订单数</th>
+        <th>成功率</th>
+        </thead>
+        <tbody>
+            {{#each successRate}}
+            <tr>
+                <td>{{name}}</td>
+                <td>{{total}}</td>
+                <td>{{success}}</td>
+                <td>
+                    {{#if total == 0}}
+                    0%
+                    {{else}}
+                    {{success / total * 100}}%
+                    {{/if}}
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    {{#if info}}
+    <table class="listTable colTable">
+        <tr>
+            <td class="title" style="width:200px">商户号：</td>
+            <td>{{info.appKey}}</td>
+        </tr>
+        <tr>
+            <td class="title">密钥：</td>
+            <td>{{info.appSecret}}</td>
+        </tr>
+        <tr>
+            <td class="title">微信手续费：</td>
+            <td>{{info.wechatRatio}}%</td>
+        </tr>
+        <tr>
+            <td class="title">支付宝手续费：</td>
+            <td>{{info.aliRatio}}%</td>
+        </tr>
+        <tr>
+            <td class="title">银行卡手续费：</td>
+            <td>{{info.bankRatio}}%</td>
+        </tr>
+        <tr>
+            <td class="title">API文件：</td>
+            <td><a href="/API.pdf">点击下载</a></td>
+        </tr>
+    </table>
+    {{/if}}
+    <div class="modal fade" id="addorderModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">申请下发</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <table class="listTable colTable">
+                    <tr>
+                        <td colspan="3">
+                            <label>{{errorMessage}}</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="title">银行名称：</td>
+                        <td><select id="BankId" name="BankId" value='{{BankId}}'>
+                            <option value="中国工商银行">中国工商银行</option>
+                            <option value="中国农业银行">中国农业银行</option>
+                            <option value="中国银行">中国银行</option>
+                            <option value="中国建设银行">中国建设银行</option>
+                            <option value="中国交通银行">中国交通银行</option>
+                            <option value="中国招商银行">中国招商银行</option>
+                            <option value="中信银行">中信银行</option>
+                            <option value="中国民生银行">中国民生银行</option>
+                            <option value="中国光大银行">中国光大银行</option>
+                            <option value="中国平安银行">中国平安银行</option>
+                            <option value="上海浦东发展银行">上海浦东发展银行</option>
+                            <option value="中国邮政储蓄银行">中国邮政储蓄银行</option>
+                            <option value="华夏银行">华夏银行</option>
+                            <option value="兴业银行">兴业银行</option>
+                            <option value="北京银行">北京银行</option>
+                            <option value="上海银行">上海银行</option>
+                            <option value="广东发展银行">广东发展银行</option>
+                            <option value="厦门银行">厦门银行</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="title">持卡人：</td>
+                        <td><input type="text" name="AccountOwner" value="{{AccountOwner}}" /></td>
+                    </tr>
+                    <tr>
+                        <td class="title">银行卡号：</td>
+                        <td><input type="text" name="AccountNumber" value="{{AccountNumber}}" /></td>
+                    </tr>
+                    <tr>
+                        <td class="title">下发金额：</td>
+                        <td><input type="text" name="Amount" value="{{Amount}}" /></td>
+                    </tr>
+                    <tr>
+                        <td class="title">验证码：</td>
+                        <td>
+                            <input type="text" name="captcha" value="{{captcha}}" style="width:190px" autocomplete="off" />
+                            <img src="/Home/CaptchaImage" id="inputCaptchaImg" on-click="refreshCaptcha" style="width:100px; vertical-align:middle; height:33px;" />
+                        </td>
+                    </tr>
+                </table>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" on-click="postorder">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+@section Scripts{
+<script type="text/javascript">
+	$(document).ready(initConsole);
+</script>
+}

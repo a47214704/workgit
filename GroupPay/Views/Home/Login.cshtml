@@ -1,0 +1,23 @@
+﻿@model GroupPay.Controllers.HomeController.LoginRequest
+@{
+}
+
+@if (ViewData["Error"] != null)
+{
+    <h2 style="color:#ff0000">@ViewData["Error"]</h2>
+}
+
+<div class="login">
+@using (Html.BeginForm("Login", "Home", FormMethod.Post))
+{
+    <div><label for="Username">用户名:</label></div>
+    <div>@Html.TextBox("Username")</div>
+    <div><label for="Password">密码:</label></div>
+    <div>@Html.Password("Password")</div>
+    <div><label for="Captcha">验证码:</label></div>
+    <div>@Html.TextBox("Captcha", null, new { @class="captcha-input"})
+		<img src="@Url.Action("CaptchaImage", "Home")" />
+	</div>
+    <div class="btn-row"><input type="submit" value="登录" /></div>
+}
+</div>

@@ -1,0 +1,99 @@
+﻿@using System.Security.Claims;
+@using Core;
+
+@{
+    string actionName = ViewContext.RouteData.Values["Action"].ToString().ToLower();
+    string userName = this.Context.User.FindFirstValue(ClaimTypes.Name);
+    bool showReport = actionName == "report" || actionName == "rechargereport" || actionName == "merchantreport";
+}
+    <header>
+        <div class="welcome">
+            <div id="HearderTarget"></div>
+            <script id="HearderTemplate" type="text/reactive">
+                <span>未处理下发订单:</span>
+                <button class="btn btn-sm btn-danger"><a href="/Home/WireOutLog">{{count}}</a></button>
+                欢迎您：
+                <span>@Html.ActionLink(@userName, "SelfMgmt", "Home", new { userId = this.Context.User.GetId() })</span> &nbsp;| &nbsp;
+                @Html.ActionLink("登出", "Logout")
+            </script>
+        </div>
+        <div class="menu">
+            <ul>
+                <li class="@(actionName == "console" ? "selected": "")">@Html.ActionLink("首页", "Console")</li>
+                @if (this.Context.User.HasRole("Agent") || this.Context.User.HasRole("AgentMgmt"))
+                {
+                    <li class="@(actionName == "agentreport" ? "selected": "")">@Html.ActionLink("商戶列表", "AgentReport", "Home", new { userId = this.Context.User.GetId() })</li>
+                }
+                @if (this.Context.User.HasRole("UserReader"))
+                {
+                    <li class="@(actionName == "listusers" ? "selected": "")">@Html.ActionLink("用户列表", "ListUsers")</li>
+                }
+                @if (this.Context.User.HasRole("PaymentReader"))
+                {
+                    <li class="@(actionName == "listpayments" ? "selected": "")">@Html.ActionLink("支付订单", "ListPayments")</li>
+                }
+
+                @if (this.Context.User.HasRole("ReportReader") || this.Context.User.HasRole("RechargeReader") || this.Context.User.HasRole("Agent"))
+                {
+                    <li class="@(showReport ? "selected" : "")">
+                        @if (this.Context.User.HasRole("ReportReader"))
+                        {
+                            <a href="#" onclick="onClicksub('sub_menu_ReportReader');">@Html.ActionLink("報表系統", "Report")</a>
+                        }
+                        else if (this.Context.User.HasRole("Agent"))
+                        {
+                            <a href="#" onclick="onClicksub('sub_menu_ReportReader');">@Html.ActionLink("報表系統", "MerchantReport")</a>
+                        }
+                    </li>
+                }
+                @if (this.Context.User.HasRole("RechargeReader"))
+                {
+                    <li class="@(actionName == "transactionlog" ? "selected": "")">@Html.ActionLink("交易紀錄", "TransactionLog")</li>
+                }
+                @if (this.Context.User.HasRole("AgentSettler"))
+                {
+                    <li class="@(actionName == "wireoutlog" ? "selected": "")">@Html.ActionLink("下發紀錄", "WireOutLog")</li>
+                }
+                @if (this.Context.User.HasRole("ConfigWriter"))
+                {
+                    <li class="@(actionName == "userevaluation" ? "selected": "")@(actionName == "siteconfigs" ? "selected": "")@(actionName == "collectchannel" ? "selected": "")@(actionName == "awardconfigs" ? "selected": "")">
+                        <a href="#" onclick="onClicksub('sub_menu_ConfigWriter');">@Html.ActionLink("功能設定", "userevaluation")</a>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="sub_menu @(showReport ? "showitem" : "") " id="sub_menu_ReportReader">
+            <!--報表系統-->
+            @if (this.Context.User.HasRole("ReportReader"))
+            {
+                <span class="@(actionName == "report" ? "selected": "")">@Html.ActionLink("支付报表", "Report")</span>
+            }
+            @if (this.Context.User.HasRole("RechargeReader"))
+            {
+                <span class="@(actionName == "rechargereport" ? "selected" : "")">@Html.ActionLink("充值报表", "RechargeReport")</span>
+            }
+        </div>
+        <div class="sub_menu @(actionName == "userevaluation" ? "showitem": "")@(actionName == "siteconfigs" ? "showitem": "")@(actionName == "collectchannel" ? "showitem": "")@(actionName == "awardconfigs" ? "showitem": "") " id="sub_menu_ConfigWriter">
+            <!--功能設定-->
+            @if (this.Context.User.HasRole("ConfigWriter"))
+            {
+                <span class="@(actionName == "userevaluation" ? "selected": "")">@Html.ActionLink("服务分设置", "userevaluation")</span>
+                <span class="@(actionName == "siteconfigs" ? "selected": "")">@Html.ActionLink("网站设置", "SiteConfigs")</span>
+                <span class="@(actionName == "collectchannel" ? "selected": "")">@Html.ActionLink("通道设置", "CollectChannel")</span>
+                <span class="@(actionName == "awardconfigs" ? "selected": "")">@Html.ActionLink("奖励设置", "awardConfigs")</span>
+            }
+        </div>
+        <div class="sub_menu @(actionName == "agentreport" ? "showitem": "")" id="sub_menu_ConfigWriter">
+            <!--功能設定-->
+            <span class="@(actionName == "agentreport" ? "selected": "")"><a href="#" onclick="javascript: history.back();">返回上一頁</a></span>
+        </div>
+    </header>
+
+<script>
+    function onClicksub (id) {
+        document.getElementById("sub_menu_ReportReader").style.display = "none";
+        document.getElementById("sub_menu_ConfigWriter").style.display = "none";
+        document.getElementById(id).style.display = "block";
+    }
+	$(document).ready(orderCount);
+</script>

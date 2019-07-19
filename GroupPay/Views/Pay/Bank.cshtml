@@ -1,0 +1,81 @@
+﻿@{
+    Layout = "_PayLayout";
+}
+
+
+<body class="TJ_body">
+    <div class="TJ-header">
+        <span>充值系统</span>
+    </div>
+    <div class="content" id="target"></div>
+    <script id="ractiveTemplate" type="text/reactive">
+        <div id="Loading">
+            <table width="100%" height="100%" border="0">
+                <tr>
+                    <td align="center" valign="middle">
+                        {{#if !error}}
+                        订单号：<span id="pserno">{{mrn}}</span><br>
+                        充值金额：<span class="notice-field" id="pprice">{{amount}}</span><br>
+                        <img id="loadGif" src="/images/pay/loading.gif" />
+                        {{/if}}
+                        <div class="Loadingtxt">{{message}}</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="mainContent" style="display:none">
+            <div class="TJ-contents">
+                <table border="0">
+                    <tr>
+                        <td rowspan="3" align="center" valign="bottom" width="40%">充值金额<br />{{amount}}</td>
+                        <td width="60%">{{bankName}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{accountName}}</td>
+                    </tr>
+                    <tr>
+                        <td>{{bankCard}}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="TJ-details">
+                <ul>
+                    <li>订单号：{{mrn}}</li>
+                    <li>支持　支付宝、微信转账</li>
+                    <li>支持　手机银行大额转账　<red>秒到</red></li>
+                    <li>
+                        <div class="copytxt">
+                            姓　名：<red>{{accountName}}</red>
+                        </div>
+                        <input type="button" value="复制姓名" class="copybtn cpa" data-clipboard-text="{{accountName}}" />
+                    </li>
+                    <li>
+                        <div class="copytxt">
+                            金　额：<red>{{amount}}</red>
+                        </div>
+                        <input type="button" value="复制金额" class="copybtn cpb" data-clipboard-text="{{amount}}" />
+                    </li>
+                    <li>
+                        <div class="copytxt">
+                            卡　号：<red>{{bankCard}}</red>
+                        </div>
+                        <input type="button" value="复制卡号" class="copybtn cpc" data-clipboard-text="{{bankCard}}" />
+                    </li>
+                    <li class="dodgerblue">卡号　姓名　金额　请点击复制　金额不对不会上分</li>
+                    <li class="dodgerblue"><red>重要提示</red>　以上银行帐户限本次使用，账户每次更换</li>
+                    <li class="dodgerblue">如入款至过期帐号，无法查收，本公司恕不负责</li>
+                    <li><red>充值成功后５分钟未到帐，请马上与平台客服联系</red></li>
+                </ul>
+            </div>
+        </div>
+        <input type="button" value="返　回" class="TJ_back" onclick="window.location='@ViewBag.CallBackUrl'" />
+    </script>
+</body>
+
+@section Scripts{
+<script type="text/javascript">
+    $(document).ready(function () {
+        initBankPage("@Html.Raw(@ViewBag.ErrorMsg)");
+    });
+</script>
+}

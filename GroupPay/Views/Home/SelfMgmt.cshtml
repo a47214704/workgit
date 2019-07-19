@@ -1,0 +1,52 @@
+﻿@{
+    ViewData["Title"] = "账户中心";
+}
+<partial name="_ConsoleHeader" />
+<style>
+    .colTable td.title {
+        width: auto;
+    }
+</style>
+<div class="content">
+    <div id="target">
+    </div>
+    <script id="ractiveTemplate" type="text/reactive">
+        <div style="color:blue;padding:0 0 10px 0;">{{message}}</div>
+        <table class="listTable colTable">
+            <tr>
+                <td class="title">账号：</td>
+                <td>{{user.accountName}}<input style="height:auto" type="button" value="修改密码" on-click="openPasswordModel"></td>
+            </tr>
+            <tr>
+                <td class="title">上级账号：</td>
+                <td>{{user.upperAccountName}}</td>
+            </tr>
+            <tr>
+                <td class="title">角色：</td>
+                <td>
+                    {{#each roles}}
+                        {{#if user.role.id == id}}
+                            {{memo}}
+                        {{/if}}
+                    {{/each}}
+                </td>
+            </tr>
+            {{#if user.role.id == @UserRoleType.Member}}
+                <tr>
+                    <td class="title">指定收款：</td>
+                    <td>
+                        <select name="role" value="{{user.merchantId}}">
+                            <option value="0">无指定</option>
+                            {{#each merchants}}
+                            <option value="{{id}}">{{name}}</option>
+                            {{/each}}
+                        </select>
+                    </td>
+                </tr>
+            {{/if}}
+        </table>
+    </script>
+</div>
+@section Scripts{
+    <script type="text/javascript">$(document).ready(initUserEdit);</script>
+}

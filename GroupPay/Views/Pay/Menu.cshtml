@@ -1,0 +1,111 @@
+﻿@{
+    Layout = "";
+}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>欢迎使用淘金宝，我们将为您提供最好的服务！</title>
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute"
+              crossorigin="anonymous"
+              integrity="sha256-eSi1q2PG6J7g7ib17yAaWMcrr5GrtohYChqibrV7PBE=" />
+    </environment>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ractive/1.3.0/ractive.min.js"
+            asp-fallback-src="~/lib/ractive/ractive.js"
+            asp-fallback-test="window.Ractive"
+            crossorigin="anonymous"></script>
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    </environment>
+
+    <link rel="stylesheet" href="~/css/pay.css" />
+</head>
+
+<body class="menu_bgcolor">
+    <div class="header">
+        充值系統
+    </div>
+    @if (ViewBag.ErrorMsg != null && ViewBag.ErrorMsg != "")
+    {
+        <div id="Error">
+            <table width="100%" height="100%" border="0">
+                <tr>
+                    <td align="center" valign="middle">
+                        <div class="Loadingtxt">@Html.Raw(@ViewBag.ErrorMsg)</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    }
+    <div class="content" id="target"></div>
+    <script id="ractiveTemplate" type="text/reactive">
+        <div id="Loading" style="display:none">
+            <table width="100%" height="100%" border="0">
+                <tr>
+                    <td align="center" valign="middle">
+                        <img src="/images/pay/loading.gif" />
+                        <div class="Loadingtxt">加载中....</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="title">请选择充值方式</div>
+        <div id="menu">
+            <table class="menuTable" border="1">
+                <tr>
+                    <td {{#if !channel[1]}} class="opacity" {{/if}} onclick="{{#if channel[1]}}window.location='./AliScan?appkey=@ViewBag.MId&Id=@ViewBag.Id'{{else}}alert('即将开放，敬请期待!'){{/if}}"><img src="/images/pay/aliLogo.png" alt="" /><br />支付宝扫码<br />{{channelLimit['Ali']['item1']}}~{{channelLimit['Ali']['item2']}}</td>
+                    <td {{#if !channel[0]}} class="opacity" {{/if}} onclick="{{#if channel[0]}}window.location='./Wechat?appkey=@ViewBag.MId&Id=@ViewBag.Id'{{else}}alert('即将开放，敬请期待!'){{/if}}"><img src="/images/pay/wxLogo.png" alt="" /><br />微信扫码<br />{{channelLimit['Wechat']['item1']}}~{{channelLimit['Wechat']['item2']}}</td>
+                    <!--<td {{#if !channel[5]}} class="opacity" {{/if}} onclick="{{#if channel[5]}}window.location='./AliBankRedirect?appkey=@ViewBag.MId&Id=@ViewBag.Id'{{else}}alert('即将开放，敬请期待!'){{/if}}"><img src="~/images/pay/aliLogo.png" alt="" /><br />支付宝转银行卡<br />{{channelLimit['AliToCard']['item1']}}~{{channelLimit['AliToCard']['item2']}}</td>-->
+                    <td {{#if !channel[2]}} class="opacity" {{/if}} onclick="{{#if channel[2]}}window.location='./Bank?appkey=@ViewBag.MId&Id=@ViewBag.Id'{{else}}alert('即将开放，敬请期待!'){{/if}}"><img src="/images/pay/aliLogo.png" alt="" /><br />支付宝转银行卡<br />{{channelLimit['Card']['item1']}}~{{channelLimit['Card']['item2']}}</td>
+                </tr>
+                <tr>
+                    <td {{#if !channel[6]}} class="opacity" {{/if}} onclick="{{#if channel[6]}}window.location='./AliScanRedirect?appkey=@ViewBag.MId&Id=@ViewBag.Id'{{else}}alert('即将开放，敬请期待!'){{/if}}"><img src="/images/pay/aliLogo.png" alt="" /><br />支付宝 WAP<br />{{channelLimit['AliWap']['item1']}}~{{channelLimit['AliWap']['item2']}}</td>
+                    <td {{#if !channel[7]}} class="opacity" {{/if}} onclick="{{#if channel[7]}}window.location='./WechatRedirect?appkey=@ViewBag.MId&Id=@ViewBag.Id'{{else}}alert('即将开放，敬请期待!'){{/if}}"><img src="/images/pay/wxLogo.png" alt="" /><br />微信 WAP<br />{{channelLimit['WechatWap']['item1']}}~{{channelLimit['WechatWap']['item2']}}</td>
+                    <td class="opacity" onclick="alert('即将开放，敬请期待!')"><img src="/images/pay/upLogo.png" alt="" /><br />银联转账<br />{{channelLimit['Card']['item1']}}~{{channelLimit['Card']['item2']}}</td>
+                </tr>
+                <tr>
+                    <td {{#if !channel[8]}} class="opacity" {{/if}} onclick="{{#if channel[8]}}window.location='./Wechat?appkey=@ViewBag.MId&Id=@ViewBag.Id'{{else}}alert('即将开放，敬请期待!'){{/if}}"><img src="/images/pay/aliLogo.png" alt="" /><br />支付宝H5<br />{{channelLimit['AliH5']['item1']}}~{{channelLimit['AliH5']['item2']}}</td>
+                    <td {{#if !channel[9]}} class="opacity" {{/if}} onclick="{{#if channel[9]}}window.location='./Wechat?appkey=@ViewBag.MId&Id=@ViewBag.Id'{{else}}alert('即将开放，敬请期待!'){{/if}}"><img src="/images/pay/wxLogo.png" alt="" /><br />微信H5<br />{{channelLimit['WechatH5']['item1']}}~{{channelLimit['WechatH5']['item2']}}</td>
+                    <td {{#if !channel[4]}} class="opacity" {{/if}} onclick="{{#if channel[4]}}window.location='./Wechat?appkey=@ViewBag.MId&Id=@ViewBag.Id'{{else}}alert('即将开放，敬请期待!'){{/if}}"><img src="/images/pay/uprLogo.png" alt="" /><br />云闪付扫码<br />{{channelLimit['Ubank']['item1']}}~{{channelLimit['Ubank']['item2']}}</td>
+                </tr>
+            </table>
+        </div>
+        <input type="button" value="返　回" class="TJ_back" onclick="location.href='{{callBackUrl}}'" />
+    </script>
+    <environment include="Development">
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/clipboard.js/clipboard.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
+                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                asp-fallback-test="window.jQuery"
+                crossorigin="anonymous"
+                integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=">
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js"
+                asp-fallback-src="~/lib/clipboard.js/clipboard.js"
+                crossorigin="anonymous">
+        </script>
+    </environment>
+    <script src="~/js/pay.js" asp-append-version="true"></script>
+    @if (ViewBag.ErrorMsg == null || ViewBag.ErrorMsg == "")
+    {
+        <script type="text/javascript">
+                $(document).ready(function () {
+                    initPayMenuPage("@Html.Raw(@ViewBag.MId)", @Html.Raw(@ViewBag.Amount), "@Html.Raw(@ViewBag.CallBackUrl)");
+                });
+        </script>
+    }
+</body>
+</html>

@@ -1,0 +1,375 @@
+﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification\ 
+for details on configuring this project to bundle and minify static web assets. */
+html {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    font-size: 14px;
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    color: #333;
+    font-family: Microsoft JhengHei;
+}
+
+/* Wrapping element */
+/* Set some basic padding to keep content from hitting the edges */
+.body-content {
+    position: relative;
+    height: 100%;
+}
+
+a {
+    text-decoration: none;
+    color: #0d2d60;
+}
+
+.error {
+    font-weight: bold;
+    color: #f00;
+}
+
+ul, li {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+input[type="text"], input[type="password"], select, input[type="number"] {
+    outline: none;
+    box-sizing: border-box;
+    padding: 7px 10px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #CCC;
+    height: 35px;
+    vertical-align: middle;
+    width: 170px;
+}
+
+input[type="button"], input[type="submit"] {
+    outline: none;
+    height: 35px;
+    padding: 0 15px;
+    color: white;
+    background-color: #008CBA;
+    border-radius: 5px;
+    border: none;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+input[type="button"]:hover, input[type="submit"]:hover {
+    background-color: #007aa2;
+}
+
+.login {
+    width: 300px;
+    height: 380px;
+    box-sizing: border-box;
+    padding: 40px 15px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -150px;
+    margin-top: -220px;
+    border-radius: 8px;
+    -moz-box-shadow: 1px 2px 10px #333333;
+    -webkit-box-shadow: 1px 2px 10px #333333;
+    box-shadow: 1px 2px 10px #333333;
+}
+
+.login form input[type="text"], .login form input[type="password"], .login .btn-row input {
+    width: 100%;
+}
+
+.login label {
+    line-height: 35px;
+}
+
+.login .captcha-input {
+    width: 160px !important;
+}
+
+.login img {
+    height: 33px;
+    width: 104px;
+    float: right;
+    vertical-align: middle;
+    border-radius: 5px;
+}
+
+.login .btn-row {
+    padding-top: 30px;
+}
+
+header {
+    background: #008CBA;
+    color: #fff;
+    border-bottom: 1px solid #006b8e;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.welcome {
+    text-align: right;
+    padding: 10px;
+}
+
+.welcome a {
+    color: #FFF;
+}
+
+.menu {
+    /*position:absolute;
+    height: 40px;
+    width: 100%;
+    bottom: 0;*/
+}
+
+.showitem {
+    display: block !important;
+}
+
+
+.menu ul li {
+    display: inline-block;
+    height: 40px;
+    width: 80px;
+    text-align: center;
+    line-height: 40px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+    .menu ul li a {
+        color: #fff;
+    }
+
+    .menu ul li.selected a {
+        color: #008CBA;
+    }
+
+    .menu ul li.selected {
+        background-color: #FFF;
+        height: 41px;
+    }
+
+.sub_menu {
+    background-color: white;
+    display: none;
+    padding: 15px;
+}
+
+    .sub_menu a {
+        background-color: #eaeaea;
+        padding: 5px 10px;
+        border-radius: 5px;
+        color: #008cba;
+        transition: all 0.2s ease;
+    }
+
+        .sub_menu a:hover, .sub_menu .selected a {
+            background-color: #008cba;
+            color: #eaeaea;
+            text-decoration: none;
+        }
+
+.content {
+    padding: 20px 15px;
+}
+
+
+.listTable {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fcfcfc;
+    border: 1px solid #eee;
+}
+
+    .listTable th, .listTable td {
+        padding: 5px 10px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+        vertical-align: middle !important;
+        height: 43px;
+    }
+
+    .listTable th {
+        font-weight: 600;
+        border-bottom: 1px solid #ccc;
+    }
+
+        .listTable th:nth-child(odd), td:nth-child(odd) {
+            background-color: #FFF;
+        }
+
+        .listTable th:nth-child(even), td:nth-child(even) {
+            background-color: #e7eaec;
+        }
+
+    .listTable tr.total {
+        background: #EEE;
+        color: #d80808;
+    }
+
+    .listTable a, .listTable button {
+        color: #078de0;
+        background-color: white;
+        border: 1px solid #DDD;
+        border-radius: 5px;
+        padding: 3px 5px;
+        display: inline-block;
+        margin: 2px 0;
+        transition: all 0.2s ease;
+    }
+
+        .listTable a:hover, .listTable button:hover {
+            color: #ffffff;
+            text-decoration: none;
+            background-color: #008cba;
+        }
+
+
+.colTable td {
+    line-height: 45px;
+}
+
+    .colTable td.title {
+        text-align: right;
+        width: 100px;
+        border-right: 1px solid #eee;
+    }
+
+    .colTable td input[type="password"], .colTable td input[type="text"], .colTable td select {
+        width: 100%;
+    }
+
+.pager {
+    padding-top: 20px;
+}
+
+    .pager span, .pager a {
+        display: inline-block;
+        height: 30px;
+        padding: 0 10px;
+        line-height: 30px;
+        text-align: center;
+        border: 1px solid #CCC;
+        margin-right: 2px;
+        border-radius: 3px;
+    }
+
+    .pager span {
+        background: #008CBA;
+        color: #FFF;
+        border: none;
+    }
+
+.search-row {
+    padding-bottom: 10px;
+    position: relative;
+}
+
+    .search-row label {
+        display: inline-block;
+        padding-left: 10px;
+    }
+
+#addBtn {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+#startDate, #endDate {
+    width: 100px;
+}
+#startTime, #endTime {
+    width: 80px;
+}
+
+/*凍結欄位CSS，將TABLE用div class='stickytable'包起來*/
+.stickytable {
+    white-space: nowrap;
+    overflow: auto;
+    width: 100%;
+}
+
+    .stickytable .freeze {
+        position: sticky;
+        z-index: 1;
+    }
+
+    .stickytable thead tr th {
+        position: sticky;
+        top: 0; /* 列首永遠固定於上 */
+    }
+
+/*scrollbar width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/*scrollbar Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/*scrollbar Handle */
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+#addBtn {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+#startDate, #endDate {
+    width: 100px;
+}
+#startTime, #endTime {
+    width: 80px;
+}
+
+/*凍結欄位CSS，將TABLE用div class='stickytable'包起來*/
+.stickytable {
+    white-space: nowrap;
+    overflow: auto;
+    width: 100%;
+}
+
+.stickytable .freeze {
+    position: sticky;
+    z-index: 1;
+}
+
+.stickytable thead tr th {
+    position: sticky;
+    top: 0; /* 列首永遠固定於上 */
+}
+
+/*scrollbar width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/*scrollbar Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/*scrollbar Handle */
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+/*scrollbar Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+/*END 凍結欄位CSS*/

@@ -1,0 +1,205 @@
+﻿@{
+    ViewData["Title"] = "服务分奖惩设置";
+}
+
+<partial name="_ConsoleHeader" />
+
+<div id="target" class="content"></div>
+<script id="template" type="text/ractive">
+    <div class="text-primary pb-2">{{message}}</div>
+    <div class="responsiveTable">
+        <table class="table table-striped listTable">
+            <thead>
+                <tr>
+                    <th>服务分条件</th>
+                    <th>可接单上限</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each payAllowLimits}}
+                <tr>
+                    <td>{{condition}}</td>
+                    <td>{{value}}</td>
+                    <td>
+                        <input type="hidden" value="{{id}}" />
+                        <button type="button" class="btn btn-secondary" on-click="edit">修改</button>
+                        <button type="button" class="btn btn-secondary" on-click="delete">删除</button>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        <div class="container text-left m-0">
+            <button type="button" class="btn btn-secondary" on-click="addPayAllow">添加接单限制</button>
+        </div>
+    </div>
+
+    <div class="responsiveTable">
+        <table class="table table-striped listTable">
+            <thead>
+                <tr>
+                    <th>超时订单数</th>
+                    <th>扣分</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each overTimePunishs}}
+                <tr>
+                    <td>{{condition}}</td>
+                    <td>{{value}}</td>
+                    <td>
+                        <button type="button" class="btn btn-secondary" on-click="edit">修改</button>
+                        <button type="button" class="btn btn-secondary" on-click="delete">删除</button>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        <div class="container text-left m-0">
+            <button type="button" class="btn btn-secondary" on-click="addOverTime">添加超时扣分</button>
+        </div>
+    </div>
+
+    <div class="responsiveTable">
+        <table class="table table-striped listTable">
+            <thead>
+                <tr>
+                    <th>订单完成时间</th>
+                    <th>快速完成数量</th>
+                    <th>加分</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each speedPayCommends}}
+                <tr>
+                    <td>{{condition}}</td>
+                    <td>{{count}}</td>
+                    <td>{{value}}</td>
+                    <td>
+                        <button type="button" class="btn btn-secondary" on-click="edit">修改</button>
+                        <button type="button" class="btn btn-secondary" on-click="delete">删除</button>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        <div class="container text-left m-0">
+            <button type="button" class="btn btn-secondary" on-click="addSpeedPay">添加快速奖励</button>
+        </div>
+    </div>
+
+    <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">{{confirmTitle}}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h6>{{confirmMsg}}</h6>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" on-click="actionConfirmed">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="payAllowModal" tabindex="-1" role="dialog" aria-labelledby="payAllowModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="payAllowModalLabel">添加接单限制</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="condition">服务分条件:</label>
+                            <input type="number" id="payAllowCondition" style="width:100%" value="{{condition}}" class="form-control" placeholder="服务分条件" />
+                        </div>
+                        <div class="form-group">
+                            <label for="value">可接单上限:</label>
+                            <input type="number" id="payAllowValue" style="width:100%" value="{{value}}" class="form-control" placeholder="可接单上限" />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" on-click="doPutPayAllow">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="overTimePunishsModal" tabindex="-1" role="dialog" aria-labelledby="overTimePunishsModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="overTimePunishsModalLabel">添加超时扣分</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="overTimeCondition">超时订单数:</label>
+                            <input type="number" id="overTimeCondition" style="width:100%" value="{{condition}}" class="form-control" placeholder="超时订单数" />
+                        </div>
+                        <div class="form-group">
+                            <label for="overTimeValue">扣分:</label>
+                            <input type="number" id="overTimeValue" style="width:100%" value="{{value}}" class="form-control" placeholder="扣分" />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" on-click="doPutOverTime">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="speedPayCommends" tabindex="-1" role="dialog" aria-labelledby="speedPayCommendLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="speedPayCommendLabel">添加快速奖励</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="speedPayCondition">订单完成时间:</label>
+                            <input type="number" id="speedPayCondition" style="width:100%" value="{{condition}}" class="form-control" placeholder="订单完成时间" />
+                        </div>
+                        <div class="form-group">
+                            <label for="speedPayCount">快速完成数量:</label>
+                            <input type="number" id="speedPayCount" style="width:100%" value="{{count}}" class="form-control" placeholder="快速完成数量" />
+                        </div>
+                        <div class="form-group">
+                            <label for="speedPayValue">加分:</label>
+                            <input type="number" id="speedPayValue" style="width:100%" value="{{value}}" class="form-control" placeholder="加分" />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" on-click="doPutSpeedPay">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+@section Scripts{
+    <script type="text/javascript">$(document).ready(initEvaluationConfigPage);</script>
+}

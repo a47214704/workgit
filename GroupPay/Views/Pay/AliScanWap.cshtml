@@ -1,0 +1,63 @@
+﻿@{
+    Layout = "_PayLayout";
+}
+<body>
+    <div class="header">
+        <div class="logoimg">
+            <img src="~/images/pay/ali.png" alt="" />
+        </div>
+        <div class="col-match">
+            充值金额：@ViewBag.Amount
+            <input type="button" value="复制金额" class="copybtn cp" data-clipboard-text="@ViewBag.Amount" />
+        </div>
+    </div>
+    <div class="content">
+        <div class="top_info align-center">
+            <h3>请长按识别二维码</h3>
+        </div>
+        <div class="qrcode">
+            <div class="qrcode_border" id="QrCode">
+                <img src="@ViewBag.QrCode" alt="">
+            </div>
+            <p style="display:none" id="error"></p>
+        </div>
+        <div class="timer">
+            <span><font id="hour">00</font> 时</span>
+            <span><font id="min">00</font> 分</span>
+            <span><font id="sec">00</font> 秒</span>
+        </div>
+        <div class="info-notice line-height">
+            订单号：<span id="pserno">@ViewBag.RefNumber</span><br>
+            <span class="blue">支付步骤：</span><br>
+            <span class="blue">一、请复制金额</span><br>
+            <span class="blue">二、请长按识别二维码</span><br>
+            <span class="blue">三、黏贴金额，完成支付</span><br>
+            <span class="red">重要提示：请勿重复支付</span><br>
+            <span class="red">注：有任何问题请联系平台客服</span>
+        </div>
+    </div>
+</body>
+@section Scripts{
+    <script type="text/javascript">
+        var countDownSec = @Html.Raw(@ViewBag.CountDown);
+
+        $(document).ready(function () {
+            var Cp = new ClipboardJS('.cp');
+            Cp.on('success', function (e) {
+                console.log(e);
+                alert("已复制订单金额：" + e.text);
+            });
+
+            Cp.on('error', function (e) {
+                console.log(e);
+            });
+
+            setTimeout(function () {
+                $("#GetAmount").trigger("click");
+            }, 1000);
+
+            countDown();
+        });
+        
+    </script>
+}

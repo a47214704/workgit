@@ -1,0 +1,66 @@
+﻿@{
+    Layout = "";
+}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>欢迎使用淘金宝，我们将为您提供最好的服务！</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ractive/1.3.0/ractive.min.js"
+            asp-fallback-src="~/lib/ractive/ractive.js"
+            asp-fallback-test="window.Ractive"
+            crossorigin="anonymous"></script>
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute"
+              crossorigin="anonymous"
+              integrity="sha256-eSi1q2PG6J7g7ib17yAaWMcrr5GrtohYChqibrV7PBE=" />
+    </environment>
+
+    <link rel="stylesheet" href="~/css/pay.css" asp-append-version="true" />
+    <script>
+        function resetScale() {
+            var scale = screen.width / 500;
+            var viewport = $('meta[name=viewport]');
+            viewport.attr('content', 'width=device-width,initial-scale=1.0,minimum-scale=' + scale + ',maximum-scale=' + scale + ',user-scalable=no,minimal-ui');
+        }
+        window.onresize = resetScale;
+    </script>
+</head>
+
+@RenderBody();
+
+    <environment include="Development">
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/clipboard.js/clipboard.js"></script>
+    <script src="~/lib/jquery.qrcode/jquery.qrcode.min.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
+                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                asp-fallback-test="window.jQuery"
+                crossorigin="anonymous"
+                integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=">
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js"
+                asp-fallback-src="~/lib/clipboard.js/clipboard.js"
+                crossorigin="anonymous">
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"
+                asp-fallback-src="~/lib/jquery.qrcode/jquery.qrcode.min.js"
+                crossorigin="anonymous">
+        </script>
+    </environment>
+    <script src="~/js/tool.js" asp-append-version="true"></script>
+    <script src="~/js/pay.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+
+</html>

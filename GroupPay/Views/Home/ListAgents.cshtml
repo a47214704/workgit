@@ -1,0 +1,104 @@
+﻿@using Core;
+@{
+    ViewData["Title"] = "商戶列表";
+}
+<partial name="_ConsoleHeader" />
+<div class="content">
+    <div id="target">
+    </div>
+    <script id="ractiveTemplate" type="text/ractive">
+        <div class="search-row">
+            <label>账号：</label><input type="text" name="searchText" id="searchText" value="{{keyword}}" />
+            @if (this.Context.User.HasRole("AgentMgmt") || this.Context.User.HasRole("Agent"))
+            {
+                <label>类型：</label>
+                <select id="status" name="status" value='{{status}}'>
+                    @foreach (AccountStatus status in Enum.GetValues(typeof(AccountStatus)))
+                    {
+                        switch (status)
+                        {
+                            case AccountStatus.Active:
+                                <option value="1">正常</option>
+                                break;
+                            case AccountStatus.Lockout:
+                                <option value="2">锁定</option>
+                                break;
+                            case AccountStatus.Disabled:
+                                <option value="3">禁用</option>
+                                break;
+                            case AccountStatus.Removed:
+                                <option value="4">移除</option>
+                                break;
+                            case AccountStatus.NotYetVerified:
+                                <option value="-1">未启动</option>
+                                break;
+                        }
+                    }
+                </select>
+            }
+            <input type="button" name="searchBtn" id="searchBtn" value="查找" on-click="doSearch" />
+            @if (this.Context.User.HasRole("AgentMgmt"))
+            {
+                <input type="button" name="addBtn" id="addBtn" value="添加商户" on-click="addAgent" />
+            }
+        </div>
+        <div style="color:blue;padding:0 0 10px 0;">{{message}}</div>
+        <table class="listTable">
+            <thead>
+            <th>ID</th>
+            <th>账号</th>
+            <th>昵称</th>
+            <th>微信手续费(%)</th>
+            <th>支付宝手续费(%)</th>
+            <th>银行卡手续费(%)</th>
+            <th>是否为代理</th>
+            <th>状态</th>
+            <th>创建时间</th>
+            <th>最后登录</th>
+            <th>操作</th>
+            </thead>
+            <tbody>
+                {{#each users}}
+                <tr>
+                    <td><a href="/home/AgentReport?userId={{id}}">{{id}}</td>
+                    <td>{{accountName}}</td>
+                    <td>{{nickName}}</td>
+                    <td>{{merchant.wechatRatio}}</td>
+                    <td>{{merchant.aliRatio}}</td>
+                    <td>{{merchant.bankRatio}}</td>
+                    <td>{{#if hasSubAccounts}}是{{else}}否{{/if}}</td>
+                    <td>{{#if status == 1}}正常{{elseif status == 2}}锁定{{elseif status == 3}}禁用{{elseif status == -1}}未启动{{else}}已删除{{/if}}</td>
+                    <td>{{formatTimestamp(createTimestamp)}}</td>
+                    <td>{{formatTimestamp(lastLoginTimestamp)}}</td>
+                    <td>
+                        @if (this.Context.User.HasRole("AgentMgmt"))
+                        {
+                            <a href="javascript:void(0);" on-click="agentEdit"> 编辑</a>
+                            <a href="javascript:void(0);" on-click="addAgentUser"> 添加下級</a>
+                        }
+                        {{#if status == -1}}
+                        @if (this.Context.User.HasRole("AgentMgmt"))
+                        {
+                            <a href="javascript:void(0);" on-click="verifyUser">启动</a>
+                        }
+                        {{/if}}
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        <div class="pager">
+            <span>共 {{totalRecords}} 条</span>
+            {{#each pages as p}}
+            {{#if p == currentPage || p == -1}}
+            <span>{{#if p == -1}}...{{else}}{{p+1}}{{/if}}</span>
+            {{else}}
+            <a href="javascript:void(0);" on-click="doPage">{{p+1}}</a>
+            {{/if}}
+            {{/each}}
+        </div>
+    </script>
+</div>
+@section Scripts{
+    <script type="text/javascript">$(document).ready(initAgentListPage);</script>
+}

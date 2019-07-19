@@ -1,0 +1,60 @@
+﻿@using System.Security.Claims;
+@using Core;
+@{
+    ViewData["Title"] = "新增订单";
+}
+<div class="content">
+    <div id="target">
+    </div>
+    <script id="ractiveTemplate" type="text/reactive">
+        <div style="color:blue;padding:0 0 10px 0;">{{message}}</div>
+        <table class="listTable colTable">
+            <tr>
+                <td class="title">订单金额：</td>
+                <td>￥<input value="{{amount}}" type="number" /></td>
+            </tr>
+            <tr>
+                <td class="title">操作员ID：</td>
+                <td><input value="{{userId}}" type="number" /></td>
+            </tr>
+            <tr>
+                <td class="title">商户：</td>
+                <td>
+                    <select value="{{merchant}}">
+                        {{#each merchants}}
+                        <option value="{{id}}">{{name}}</option>
+                        {{/each}}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="title">通道类型：</td>
+                <td>
+                    <select value="{{channel}}">
+                        {{#each channels}}
+                        <option value="{{id}}">{{name}}</option>
+                        {{/each}}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="title">验证码：</td>
+                <td>
+                    <input type="text" name="captcha" value="{{captcha}}" style="width:190px" autocomplete="off" />
+                    <img src="/Home/CaptchaImage?token=createPayment_@this.Context.User.GetId()" id="inputCaptchaImg" on-click="refreshCaptcha" style="width:100px; vertical-align:middle; height:33px;" />
+                </td>
+            </tr>
+        </table>
+
+        <div style="text-align:center; padding-top:15px;">
+            <input type="button" value="确定" on-click="create">
+        </div>
+    </script>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            initCreateOrder('@this.Context.User.GetId()')
+        });
+    </script>
+}

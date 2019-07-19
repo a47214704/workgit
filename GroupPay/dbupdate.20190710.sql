@@ -1,0 +1,1 @@
+﻿alter table `transaction_log` add `amountFrom` bigint;

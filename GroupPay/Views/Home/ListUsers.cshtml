@@ -1,0 +1,161 @@
+﻿@using Core;
+
+@{
+    ViewData["Title"] = "用户列表";
+    int AgentIdType = (int)UserRoleType.Agent;
+}
+<partial name="_ConsoleHeader" />
+<div class="content">
+    <div id="target">
+    </div>
+    <script id="ractiveTemplate" type="text/ractive">
+        <div class="search-row">
+            <label>账号：</label><input type="text" name="searchText" id="searchText" value="{{keyword}}" />
+            @if (this.Context.User.HasRole("UserMgmt"))
+            {
+                <label>角色：</label><select id="roleId" name="roleId" value='{{roleId}}'>
+                    {{#each roles}}
+                    {{#if id != @AgentIdType}}
+                    <option value="{{id}}">{{memo}}</option>
+                    {{/if}}
+                    {{/each}}
+                </select>
+                <label>类型：</label>
+                <select id="status" name="status" value='{{status}}'>
+                @foreach (AccountStatus status in Enum.GetValues(typeof(AccountStatus)))
+                {
+                    switch (status)
+                    {
+                        case AccountStatus.Active:
+                            <option value="1">正常</option>
+                            break;
+                        case AccountStatus.Lockout:
+                            <option value="2">锁定</option>
+                            break;
+                        case AccountStatus.Disabled:
+                            <option value="3">禁用</option>
+                            break;
+                        case AccountStatus.Removed:
+                            <option value="4">移除</option>
+                            break;
+                        case AccountStatus.NotYetVerified:
+                            <option value="-1">未启动</option>
+                            break;
+                    }
+                }
+                </select>
+            }
+            <input type="button" name="searchBtn" id="searchBtn" value="查找" on-click="doSearch" />
+            @if (this.Context.User.HasRole("UserMgmt"))
+            {
+                <input type="button" name="addBtn" id="addBtn" value="添加账号" on-click="addUser" />
+            }
+        </div>
+        <div style="color:blue;padding:0 0 10px 0;">{{message}}</div>
+        <div class="stickytable">
+            <table class="listTable">
+                <thead>
+                    <th class="freeze" style="left:0px;width:50px;">ID</th>
+                    <th class="freeze" style="left:50px;width:100px;">账号</th>
+                    <th class="freeze" style="left:160px;width:60px;">余额</th>
+                    <th class="freeze" style="left:220px;width:60px;">运输中</th>
+                    <th class="freeze" style="left:280px;width:60px;">未领奖励</th>
+                    <th class="freeze" style="left:340px;width:60px;">未领利润</th>
+                    <th class="freeze" style="left:400px;width:60px;">总额</th>
+                    <th class="freeze" style="left:460px;width:60px;">服务分</th>
+                    <th>角色</th>
+                    <th>是否为代理</th>
+                    <th>指定收款</th>
+                    <th>微信</th>
+                    <th>状态</th>
+                    <th>创建时间</th>
+                    <th>最后登录</th>
+                    <th class="freeze" style="right:0px;width:120px;">操作</th>
+                </thead>
+                    <tbody>
+                        {{#each users}}
+                        <tr>
+                            <td class="freeze" style="left:0px;width:50px;">{{id}}</td>
+                            <td class="freeze" style="left:50px;width:100px;">{{accountName}}</td>
+                            <td class="freeze" style="left:160px;width:60px;">{{balance.toLocaleString('en-US')}}</td>
+                            <td class="freeze" style="left:220px;width:60px;">{{(pendingBalance/100).toLocaleString('en-US')}}</td>
+                            <td class="freeze" style="left:280px;width:60px;">{{award.toLocaleString('en-US')}}</td>
+                            <td class="freeze" style="left:340px;width:60px;">{{commission.toLocaleString('en-US')}}</td>
+                            <td class="freeze" style="left:400px;width:60px;">{{(balance + pendingBalance/100 + award + commission).toLocaleString('en-US')}}</td>
+                            <td class="freeze" style="left:460px;width:60px;">{{point}}</td>
+                            <td>
+                                {{#each roles}}
+                                {{#if id == role.id}}{{memo}}{{/if}}
+                                {{/each}}
+                            </td>
+                            <td>{{#if hasSubAccounts}}是{{else}}否{{/if}}</td>
+                            <td>
+                                {{#each merchants}}
+                                {{#if id == merchantId}}
+                                {{name}}
+                                {{/if}}
+                                {{/each}}
+                            </td>
+                            <td>{{wechatAccount}}</td>
+                            <td>{{#if status == 1}}正常{{elseif status == 2}}锁定{{elseif status == 3}}禁用{{elseif status == -1}}未启动{{else}}已删除{{/if}}</td>
+                            <td>{{formatTimestamp(createTimestamp)}}</td>
+                            <td>{{formatTimestamp(lastLoginTimestamp)}}</td>
+                            <td class="freeze" style="right:0px;width:120px;">
+                                @if (this.Context.User.HasRole("BalanceMgr"))
+                                {
+                                    <a href="javascript:void(0);" on-click="addCredit">加分</a>
+                                }
+                                @if (this.Context.User.HasRole("UserMgmt"))
+                                {
+                                    <a href="javascript:void(0);" on-click="userEdit">编辑</a>
+                                    <a href="javascript:void(0);" on-click="addEvaluation">服务分修改</a>
+                                    <a href="javascript:void(0);" on-click="addChildUser"> 新增下级用户</a>
+                                    <a href="javascript:void(0);" on-click="childUserList"> 查看下级用户</a>
+                                }
+                                {{#if status == -1}}
+                                @if (this.Context.User.HasRole("UserMgmt"))
+                                {
+                                    <a href="javascript:void(0);" on-click="verifyUser">启动</a>
+                                }
+                                {{/if}}
+                            </td>
+                        </tr>
+                        {{/each}}
+                        {{#if totalSummary}}
+                        <tr>
+                            <td class="freeze" style="left:0px;width:50px;">本页总和</td>
+                            <td class="freeze" style="left:50px;width:100px;"></td>
+                            <td class="freeze" style="left:160px;width:60px;">{{pageSummary.balance.toLocaleString('en-US')}}</td>
+                            <td class="freeze" style="left:220px;width:60px;">{{(pageSummary.pendingBalance/100).toLocaleString('en-US')}}</td>
+                            <td class="freeze" style="left:280px;width:60px;">{{pageSummary.award.toLocaleString('en-US')}}</td>
+                            <td class="freeze" style="left:340px;width:60px;">{{pageSummary.commission.toLocaleString('en-US')}}</td>
+                            <td class="freeze" style="left:400px;width:60px;">{{(pageSummary.balance + pageSummary.pendingBalance/100 + pageSummary.award + pageSummary.commission).toLocaleString('en-US')}}</td>
+                        </tr>
+                        <tr>
+                            <td class="freeze" style="left:0px;width:50px;">全部总和</td>
+                            <td class="freeze" style="left:50px;width:100px;"></td>
+                            <td class="freeze" style="left:160px;width:60px;">{{totalSummary.balance.toLocaleString('en-US')}}</td>
+                            <td class="freeze" style="left:220px;width:60px;">{{(totalSummary.pendingBalance/100).toLocaleString('en-US')}}</td>
+                            <td class="freeze" style="left:280px;width:60px;">{{totalSummary.award.toLocaleString('en-US')}}</td>
+                            <td class="freeze" style="left:340px;width:60px;">{{totalSummary.commission.toLocaleString('en-US')}}</td>
+                            <td class="freeze" style="left:400px;width:60px;">{{(totalSummary.balance + totalSummary.pendingBalance/100 + totalSummary.award + totalSummary.commission).toLocaleString('en-US')}}</td>
+                        </tr>
+                        {{/if}}
+                    </tbody>
+            </table>
+        </div>
+		<div class="pager">
+			<span>共 {{totalRecords}} 条</span>
+            {{#each pages as p}}
+				{{#if p == currentPage || p == -1}}
+					<span>{{#if p == -1}}...{{else}}{{p+1}}{{/if}}</span>
+				{{else}}
+					<a href="javascript:void(0);" on-click="doPage">{{p+1}}</a>
+				{{/if}}
+            {{/each}}
+        </div>
+    </script>
+</div>
+@section Scripts{
+<script type="text/javascript">$(document).ready(initUserListPage);</script>
+}

@@ -1,0 +1,72 @@
+﻿@{
+    ViewData["Title"] = "商戶编辑";
+}
+<style>
+    .colTable td.title {
+        width:auto;
+    }
+</style>
+<div class="content">
+	<div id="target">
+    </div>
+    <script id="ractiveTemplate" type="text/reactive">
+		<div style="color:blue;padding:0 0 10px 0;">{{message}}</div>
+        <table class="listTable colTable">
+            <tr>
+                <td class="title">账号：</td>
+                <td>{{user.accountName}}</td>
+            </tr>
+            <tr>
+                <td class="title">昵称：</td>
+                <td><input type="text" name="nickName" value="{{user.nickName}}" /></td>
+            </tr>
+            <tr>
+                <td class="title">密码：</td>
+                <td><input type="password" name="password" placeHolder="留空即不修改" value="{{user.password}}" /></td>
+            </tr>
+            <tr>
+                <td class="title">状态：</td>
+                <td>
+                    <select name="status" value="{{user.status}}">
+                        <option value="1">正常</option>
+                        <option value="2">锁定</option>
+                        <option value="3">禁用</option>
+                        <option value="4">删除</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="title" style="width:200px">微信手续费(%)：</td>
+                <td><input type="number" name="wechatRatio" value="{{user.merchant.wechatRatio}}" /></td>
+            </tr>
+            <tr>
+                <td class="title" style="width:200px">支付宝手续费(%)：</td>
+                <td><input type="number" name="aliRatio" value="{{user.merchant.aliRatio}}" /></td>
+            </tr>
+            <tr>
+                <td class="title" style="width:200px">银行卡手续费(%)：</td>
+                <td><input type="number" name="bankRatio" value="{{user.merchant.bankRatio}}" /></td>
+            </tr>
+            <tr>
+                <td class="title" style="width:200px">开启支付通道：</td>
+                <td>
+                    <div class="row">
+                        {{#each channel}}
+                            {{#if enabled}}
+                                <div class="col-6"><input type="checkbox" name="OpenChannel" data-value="{{id}}" {{#if selected}}checked="checked"{{/if}}>{{name}}</div>
+                            {{else}}
+                                <input type="hidden" name="OpenChannel" data-value="{{id}}">
+                            {{/if}}
+                        {{/each}}
+                    </div>
+                </td>
+            </tr>
+        </table>
+		<div style="text-align:center; padding-top:15px;">
+			<input type="button" value="保存" on-click="saveAgent">
+		</div>
+	</script>
+</div>
+@section Scripts{
+<script type="text/javascript">$(document).ready(initAgentEdit);</script>
+}

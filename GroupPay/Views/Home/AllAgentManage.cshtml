@@ -1,0 +1,134 @@
+﻿@{
+    ViewData["Title"] = "支付报表";
+}
+<partial name="_ConsoleHeader" />
+<div class="content" id="target"></div>
+
+<script id="ractiveTemplate" type="text/reactive">
+    <div class="search-row">
+        <label>用户账号：</label><input type="text" name="accountName" id="accountName" value="{{accountName}}" />
+        <label>ID查询：</label><input type="text" name="accountID" id="accountID" value="{{accountID}}" />
+        <label>姓名查询：</label><input type="text" name="accountFullName" id="accountFullName" value="{{accountFullName}}" />
+        <label>刷新：</label>
+        <select value="{{RefreshTime}}" class="widthauto">
+            <option value="60000">60秒</option>
+            <option value="120000">120秒</option>
+        </select>
+    </div>
+    <div class="search-row">
+        <label>创建时间：</label>
+        <input type="button" value="本日查询" on-click="['setDateAndTime', 'Day']" class="setDateAndTime" />
+        <input type="button" value="本周查询" on-click="['setDateAndTime', 'Week']" class="setDateAndTime" />
+        <input type="button" value="本月查询" on-click="['setDateAndTime', 'Month']" class="setDateAndTime" />
+        <br />
+        <label>　　　　　</label>
+        <input type="text" name="startDate" id="startDate" value="{{startDate}}" />
+        <input type="text" name="startTime" id="startTime" value="{{startTime}}" />
+        <label>至　</label>
+        <input type="text" name="endDate" id="endDate" value="{{endDate}}" />
+        <input type="text" name="endTime" id="endTime" value="{{endTime}}" />
+        <input type="submit" name="searchBtn" id="searchBtn" value="查找" on-click="doSearch" />
+    </div>
+    <div style="color:blue;padding:0 0 10px 0;">{{message}}</div>
+    <table class="listTable bgwhite">
+        <thead>
+            <th width="27%"></th>
+            <th width="20%"></th>
+            <th width="23%">总数</th>
+            <th width="14%">已用点数</th>
+            <th width="16%">可用点数</th>
+        </thead>
+        <tbody>
+            {{#each Toprecords}}
+            <tr>
+                <td>{{accountID}}</td>
+                <td>{{jobName}}</td>
+                <td>{{usedPoints + availablePoints}}</td>
+                <td>{{usedPoints}}</td>
+                <td>{{availablePoints }}</td>
+            </tr>
+            {{/each}}
+        <tbody>
+    </table>
+    <br>
+    <table class="listTable">
+        <thead>
+        <th width="15%">ID</th>
+        <th width="15%">账号名称</th>
+        <th width="17%">充值量</th>
+        <th width="9%">汇率(%)</th>
+        <th width="14%">佣金合计</th>
+        <th width="14%">下发金额</th>
+        <th width="16%">成功率(%)</th>
+        </thead>
+        <tbody>
+            {{#each records}}
+            <tr>
+                <td>{{id}}</td>
+                <td>{{accountName}}</td>
+                <td>{{amount}}</td>
+                <td>{{exchangeRate}}</td>
+                <td>{{commission}}</td>
+                <td></td>
+                <td>{{successRate}}</td>
+            </tr>
+            {{/each}}
+            {{#if total}}
+            <tr class="total">
+                <td>合计</td>
+                <td></td>
+                <td>{{total.amount}}</td>
+                <td>{{total.exchangeRate}}</td>
+                <td>{{total.commission}}</td>
+                <td></td>
+                <td>{{total.successRate}}</td>
+            </tr>
+            {{/if}}
+        <tbody>
+    </table>
+    <div class="pager">
+        {{#each pages as p}}
+        {{#if p == currentPage || p == -1}}
+        <span>{{#if p == -1}}...{{else}}{{p}}{{/if}}</span>
+        {{else}}
+        <a href="javascript:void(0);" on-click="doPage">{{p}}</a>
+        {{/if}}
+        {{/each}}
+    </div>
+</script>
+<script src="~/js/RechargeReport.js"></script>
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(initRechargeReport);
+    </script>
+}
+
+<style>
+    body {
+        font-family: Microsoft JhengHei !important;
+    }
+    .search-row .setDateAndTime {
+        font-size: 13px;
+        padding: 5px 10px;
+        height: auto;
+        background-color: white;
+        border: 1px solid #008CBA;
+        color: #008CBA;
+    }
+    .search-row .setDateAndTime:hover {
+        color: white;
+    }
+    .widthauto {
+        width:auto;    
+    }
+    .bgwhite th,.bgwhite td {
+        background-color:white !important;
+        border:1px solid #DDD;
+    }
+    input[type="text"], input[type="password"], select, input[type="number"] {
+        height: calc(2.25rem + 2px);
+    }
+    .listTable {
+        word-break:break-all;
+    }
+</style>

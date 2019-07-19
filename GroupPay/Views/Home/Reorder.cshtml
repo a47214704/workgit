@@ -1,0 +1,40 @@
+﻿@{
+    ViewData["Title"] = "补单";
+}
+<div class="content">
+	<div id="target">
+    </div>
+    <script id="ractiveTemplate" type="text/reactive">
+		<div style="color:blue;padding:0 0 10px 0;">{{message}}</div>
+		<table class="listTable colTable">
+			<tr>
+				<td class="title" style="width:100px;">订单号：</td>
+				<td>{{payment.id}}</td>
+			</tr>
+			<tr>
+				<td class="title">订单金额：</td>
+				<td>￥{{payment.amount / 100}}</td>
+			</tr>
+			<tr>
+				<td class="title">操作员ID：</td>
+				<td>{{payment.instrument.userId}}</td>
+			</tr>
+			<tr>
+				<td class="title">接单时间：</td>
+				<td>{{formatTimestamp(payment.acceptTimestamp)}}</td>
+			</tr>
+			<tr>
+				<td class="title">补单金额：</td>
+				<td><input type="text" name="amount" value="{{amount/100}}" /></td>
+			</tr>
+		</table>
+		<div style="text-align:center; padding-top:15px;">
+			<input type="button" value="确定" on-click="reorder">
+		</div>
+	</script>
+</div>
+@section Scripts{
+<script type="text/javascript">
+	$(document).ready(initReorder);
+</script>
+}

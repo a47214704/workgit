@@ -1,0 +1,225 @@
+﻿@model GroupPay.Controllers.HomeController.ChatSvcConnector
+@{
+    Layout = "";
+}
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>客服系统</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no,minimal-ui" />
+    <link rel="stylesheet" href="/chat/chat.css?v=6.2" type="text/css" />
+    <link href="/chat/plugin/scroll/jquery.mCustomScrollbar.css" rel="stylesheet" type="text/css" />
+    <link href="/chat/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <script>
+var serverHost = "@Model.ServiceEndpoint";
+var auth = "@Html.Raw(Model.Ticket)";
+var userName = "@Model.UserName";
+var receiver = "";
+var messageList = {};
+var manager = @(Model.IsCsRepresentative ? 1 : 0);
+var scrollPos = 'bottom';
+//var notice = "";
+var notice = false;
+    </script>
+    <script src="/chat/jquery.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <a href="javascript:history.back();" class="back"><i class="fa fa-angle-left"></i></a>客服
+        <a href="javascript:;" class="users"><i class="fa fa-whatsapp"></i></a>
+    </div>
+    <div class="chat-pannel">
+        <div class="pannel-bg"></div>
+        <div class="message-container">
+            <div id="chat-box"></div>
+        </div>
+        <div class="send-box">
+            <a href="javascript:;" class="add-file"><i class="fa fa-plus-circle"></i></a>
+            <div class="input-box">
+                <textarea id="message" name="message" class="input-txt" maxlength="1000" placeholder="输入信息"></textarea>
+            </div>
+            <input type="button" value="发 送" class="send-btn"/>
+        </div>
+        <form id="uploadForm" method="post" enctype="multipart/form-data" style="display:none;">
+            <input type="file" name="chatimg" id="chatimg" multiple/>
+        </form>
+    </div>
+
+    <div class="user-list">
+        <div class="list-pannel">
+            <div class="list-head">最近联系人</div>
+            <div class="user-scroll">
+                <ul id="top-list" class="history-user"></ul>
+                <ul id="user-list" class="history-user"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="loading">
+    <div class="load-con">
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+    </div>
+</div>
+<div id="img-viewer">
+    <div id="inner">
+        <img id="bigimg" src=""/>
+    </div>
+</div>
+<script type="text/javascript" src="/chat/plugin/scroll/jquery.mCustomScrollbar.concat.min.js"></script>
+<script type="text/javascript" src="/chat/exif.js"></script>
+<script type="text/javascript" src="/chat/ImageUploader.js"></script>
+<script src="/chat/chat.js?v=3.1"></script>
+<script src="/chat/touch.min.js"></script>
+<script type="text/javascript">
+(function($){
+    $(document).ready(function(){
+        $(".message-container").mCustomScrollbar({
+            autoHideScrollbar: true,
+            scrollButtons:{
+                enable:false
+            },
+            callbacks:{
+                onTotalScrollOffset:0,
+                onTotalScrollBack:function(){
+                    loadHistory();
+                }
+            }
+        });
+
+        $(".user-scroll").mCustomScrollbar({
+            autoHideScrollbar: true,
+            scrollButtons:{
+                enable:false
+            }
+        });
+        
+        websocket.connect(function(result){
+            if (result) {
+                preSend(userName, '', 4, '');
+            }
+        });
+
+        $('.send-btn').click(function() {
+            checkSend();
+        });
+
+        $('#chatimg').change(function(e) {
+            var extension = $(this).val();
+            if (extension.length>0){
+                extension = extension.match(/[^.]+$/).pop().toLowerCase();
+                extension = ~$.inArray(extension, ['jpg', 'jpeg', 'png', 'bmp']);
+            }
+            else{
+                event.preventDefault();
+                return;
+            }
+            
+            if (!extension) {
+                event.preventDefault();
+                alert('不支持该文件格式');
+                return;
+            }
+
+            $('.loading').show();
+        });
+
+        $('.history-user').on('click', 'li', function() {
+            var rec = $(this).attr('receiver');
+            switchUser(rec);
+            $.each($('#user-list>li'), function() {
+                $(this).removeClass('active');
+            });
+            $.each($('#top-list>li'), function() {
+                $(this).removeClass('active');
+            });
+            $(this).addClass('active');
+            $(this).find('em').hide();
+        });
+
+        $('.add-file').click(function(){
+            $('#chatimg').click();
+        });
+
+        $('.users').click(function(){
+            $('.user-list').show();
+            $('.list-pannel').animate({right:'0px'})
+            $('.users').css({"-webkit-animation":""});
+        });
+
+        $('.user-list').click(function() {
+            var cwidth = $(window).width();
+            if (cwidth < 720) {
+                $('.list-pannel').animate({right:'-300px'});
+                $('.user-list').hide();
+            }
+        });
+
+        $('#chat-box').on('click', 'img', function() {
+            var _this = $(this);
+            $('#bigimg').removeAttr('style');
+            imgShow("#img-viewer", "#inner", '#bigimg', _this);
+        });
+
+        $('#user-list').on('click', '.fa-thumb-tack', function(e) {
+            var pli = $(this).parent('li');
+            $('#top-list').prepend(pli);
+            $(this).removeClass('fa-thumb-tack');
+            $(this).addClass('fa-remove');
+            e.stopPropagation();
+        });
+        
+        $('#top-list').on('click', '.fa-remove', function(e) {
+            var pli = $(this).parent('li');
+            $('#user-list').prepend(pli);
+            $(this).removeClass('fa-remove');
+            $(this).addClass('fa-thumb-tack');
+            e.stopPropagation();
+        });
+
+        var $targetObj = $('#bigimg');
+        cat.touchjs.init($targetObj, function (left, top, scale, rotate) {});
+        cat.touchjs.drag($targetObj, function (left, top) {console.log(left);});
+        cat.touchjs.scale($targetObj, function (scale) {});
+    });
+})(jQuery);
+
+var uploader = new ImageUploader({
+    inputElement : document.getElementById('chatimg'),
+    uploadUrl : '/api/Resources/UploadImage',
+    onProgress : function(event) {
+        console.log(event);
+    },
+    onFileComplete : function(event, file) {
+        var status = event.target.status;
+        if (status == 200) {
+            var res = event.target.response;
+            res = JSON.parse(res);
+            
+            if (res.error == 0) {
+                preSend(userName, receiver, 1, res.url);
+            } else {
+                alert(res.msg);
+            }
+        } else {
+            alert('图片上传失败');
+        }
+
+        $('.loading').hide();
+    },
+    maxWidth: 600,
+    maxHeight: 600,
+    quality: 0.90
+});
+
+document.onkeydown = function(e){
+    if(e.keyCode == 13 && e.ctrlKey){
+        $('#message').val($('#message').val() + "\n");
+    }else if(e.keyCode == 13){
+        e.preventDefault();
+        checkSend();
+    }
+}
+</script>
+</body>
+</html>
