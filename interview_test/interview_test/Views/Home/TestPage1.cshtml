@@ -1,0 +1,127 @@
+﻿@{
+    ViewData["Title"] = "奕智博";
+}
+<h1>面試題目</h1>
+<hr>
+
+<div class="content" id="target"></div>
+<script id="ractiveTemplate" type="text/reactive">
+    <div id="choice">
+        {{#each  data:i}}
+        {{#if type == 1}}
+        <div style="margin:20px 0;background-color: aliceblue">
+            <div style="padding:5px 10px;">
+                <h4>第{{i+1}}題</h4>
+                <pre style="background-color: #f0f0f0">{{topic}}</pre>
+            </div>
+            <div style="padding:5px 20px">
+                <label><input type="radio" name="{{testanswer[i]}}" value="A"> A.{{a}}</label><br>
+                <label><input type="radio" name="{{testanswer[i]}}" value="B"> B.{{b}}</label><br>
+                <label><input type="radio" name="{{testanswer[i]}}" value="C"> C.{{c}}</label><br>
+                <label><input type="radio" name="{{testanswer[i]}}" value="D"> D.{{d}}</label>
+            </div>
+        </div>
+        {{/if}}
+        {{/each}}
+        {{message}}
+        <button class="btn btn-primary" on-click="next">下一頁</button>
+    </div>
+
+    <div id="short" style="display:none">
+        {{#each  data:i}}
+        {{#if type == 2}}
+        <div style="margin:20px 0;background-color: aliceblue">
+            <div style="padding:5px 10px;">
+                <h4>第{{i+1}}題</h4>
+                <pre style="background-color: #f0f0f0">{{topic}}</pre>
+            </div>
+            <div style="padding:5px 20px">
+                <textarea rows="8" style="width:100%">{{testanswer[i]}}</textarea>
+            </div>
+        </div>
+        {{/if}}
+        {{/each}}
+        {{message}}
+        <button class="btn btn-primary" on-click="previous">上一頁</button>
+        <button class="btn btn-danger" on-click="completely">作答完成</button>
+    </div>
+</script>
+<script>
+    var SetMinute = 0;
+    function Check_Time() {
+        SetMinute += 1;
+        var Check_i = document.getElementById("Check_i");
+
+        var Cal_Minute = Math.floor(Math.floor(SetMinute % 3600) / 60);
+        var Cal_Second = SetMinute % 60;
+
+        Check_i.innerHTML = Cal_Minute + "分" + Cal_Second + "秒";
+    }
+    var settimer = window.setInterval("Check_Time()", 1000);
+
+    var ractive = new Ractive({
+        target: "#target",
+        template: "#ractiveTemplate",
+        data: {
+            message: '',
+            data:'',
+            testanswer:[]
+        },
+        on: {
+            next: function (ctx) {
+                $('#choice').hide();
+                $('#short').show();
+                $('html,body').animate({ scrollTop: 0 }, 'slow');
+            },
+            previous: function (ctx) {
+                $('#choice').show();
+                $('#short').hide();
+                $('html,body').animate({ scrollTop: 0 }, 'slow');
+            },
+            completely: function (ctx) {
+                var name = decodeURIComponent(window.location.search.substring(8));
+                var json = { NAME: name ,ANSWER: this.get("testanswer").join(), TESTTIME: SetMinute };
+                console.log(json.ANSWER.split(","));
+                $.ajax({
+                        url: '/api/InterviewTest',
+                        type: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        data: JSON.stringify(json),
+                        context: this,
+                        dataType: 'json'
+                })
+                .done(function (data) {
+
+                })
+                .fail(function (xhr, status) {
+                        
+                });
+                clearInterval(settimer);
+                window.location = '/home/finishpage';
+            }
+        },
+        oncomplete: function () {
+            this._loadData();
+        },
+        _loadData: function () {
+            this.set('message', '載入中請稍等');
+            $.ajax({
+                url: '/api/InterviewTest',
+                type: 'GET',
+                context: this,
+                dataType: 'json'
+            }).done(function (data) {
+                if (data == '') {
+                    this.set('message', '資料出錯' + data.error);
+                } else {
+                    this.set('data', data);
+                    this.set('message', '');
+                }
+            }).fail(function (xhr, status) {
+                this.set('message', '加载有誤:' + status);
+            });
+        }
+    });
+</script>

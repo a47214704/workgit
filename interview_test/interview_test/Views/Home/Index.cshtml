@@ -1,0 +1,41 @@
+﻿@{
+    ViewData["Title"] = "奕智博";
+}
+<h1>面試測驗</h1>
+<hr>
+
+<div class="content" id="target"></div>
+<script id="ractiveTemplate" type="text/reactive">
+    <div class="form-horizontal">
+        <label class="col-sm-2 control-label">面試者姓名 :</label>
+        <div class="col-sm-3">
+            <input type="text" class="form-control" name="accountName" value="{{accountName}}">
+        </div>
+        <div class="inner-all">
+            <button type="button" class="btn btn-success" on-click="start">開始測驗</button>
+        </div>
+    </div>
+</script>
+<script>
+    var ractive = new Ractive({
+        target: "#target",
+        template: "#ractiveTemplate",
+        data: {
+            accountName: ''
+        },
+        oncomplete: function () {
+
+        },
+        on: {
+            start: function (ctx) {
+                var name = ctx.get("accountName");
+                if (name == '' || name == null) {
+                    alert("請輸入姓名");
+                } else {
+                    window.location = '/home/testpage1?userid=' + name;
+                }
+            }
+        }
+    }
+    );
+</script>
