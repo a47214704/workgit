@@ -1,0 +1,158 @@
+﻿@{
+    ViewData["Title"] = "題目編輯";
+}
+<div class="content" id="target"></div>
+<script id="ractiveTemplate" type="text/reactive">
+    {{message}}
+    <div id="interviewList" style="padding-top:100px">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">主題</th>
+                    <th scope="col">題目</th>
+                    <th scope="col">備註</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each data:i}}
+                <tr on-click="correct">
+                    <th scope="row">{{id}}</th>
+                    <td>{{type == 1 ? '選擇題':'簡答題'}}</td>
+                    <td width="60%">{{topic}}</td>
+                    <td>{{note}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="interviewEdit" style="padding-top:100px;display:none">
+        <div class="alert alert-info" role="alert">
+            <h3 class="display-3">主題:{{data[count].type == 1 ? '選擇題':'簡答題'}}</h3>
+            <p class="lead">{{data[count].topic}}</p>
+            {{#if data[count].type == 1}}
+            <p>A:{{data[count].a}}</p>
+            <p>B:{{data[count].b}}</p>
+            <p>C:{{data[count].c}}</p>
+            <p>D:{{data[count].d}}</p>
+            {{/if}}
+            <hr class="my-4">
+            <p>備註:{{data[count].note}}</p>
+        </div>
+        <form>
+            <div class="form-group">
+                <label for="exampleInputPassword1">題目</label>
+                <textarea rows="8" style="width:100%">{{data[count].topic}}</textarea>
+            </div>
+            {{#if data[count].type == 1}}
+            <div class="form-group">
+                <label for="exampleInputPassword1">選項A</label>
+                <input class="form-control" placeholder="A" value="{{data[count].a}}">
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">選項B</label>
+                <input class="form-control" placeholder="B" value="{{data[count].b}}">
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">選項C</label>
+                <input class="form-control" placeholder="C" value="{{data[count].c}}">
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">選項D</label>
+                <input class="form-control" placeholder="D" value="{{data[count].d}}">
+            </div>
+            {{/if}}
+            <div class="form-group">
+                <label for="exampleInputPassword1">答案</label>
+                <textarea rows="5" style="width:100%">{{data[count].answer}}</textarea>
+            </div>
+            <select class="form-control">
+                <option>選擇題</option>
+                <option>簡答題</option>
+            </select>
+        </form>
+
+        <div style="margin:20px 0px">
+            <button class="btn btn-primary" on-click="back">返回</button>
+            <button class="btn btn-danger" data-toggle="modal" data-target="#exampleModal" on-click="edit">完成</button>
+        </div>
+    </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">修改完成</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h4 class="display-3">{{data[count].topic}}</h4>
+                    <p>答案:{{data[count].answer}}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" on-click="reload">返回上一頁</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script>
+    var ractive = new Ractive({
+        target: "#target",
+        template: "#ractiveTemplate",
+        data: {
+            message: '',
+            data: '',
+            testdata: '',
+            interviewdata: [],
+            count: '',
+            upscore: '',
+            upnote: ''
+        },
+        on: {
+            correct: function (ctx) {
+                var id = ctx.get("id");
+                this.set('count', id - 1);
+
+                $('#interviewList').hide();
+                $('#interviewEdit').show();
+            },
+            back: function (ctx) {
+                $('#interviewList').show();
+                $('#interviewEdit').hide();
+            },
+            edit: function (ctx) {
+
+            },
+            reload: function (ctx) {
+                location.reload();
+            }
+        },
+        oncomplete: function () {
+            this._loadData();
+        },
+        _loadData: function () {
+            this.set('message', '載入中請稍等');
+            $.ajax({
+                url: '/api/InterviewTest',
+                type: 'GET',
+                context: this,
+                dataType: 'json'
+            }).done(function (data) {
+                if (data == '') {
+                    this.set('message', '資料出錯' + data.error);
+                } else {
+                    this.set('data', data);
+                    this.set('message', '');
+                }
+            }).fail(function (xhr, status) {
+                this.set('message', '加载有誤:' + status);
+            });
+        }
+    });
+</script>

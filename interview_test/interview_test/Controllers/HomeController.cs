@@ -59,10 +59,8 @@ namespace interview_test.Controllers
             return View();
         }
 
-        public IActionResult Contact()
+        public IActionResult Question()
         {
-            ViewData["Message"] = "Your contact page.";
-
             return View();
         }
 

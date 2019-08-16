@@ -21,7 +21,7 @@
                 <tr on-click="correct">
                     <th scope="row">{{id}}</th>
                     <td>{{name}}</td>
-                    <td>{{test_time}}</td>
+                    <td>{{testtime}}/秒</td>
                     <td>{{timestamp}}</td>
                     <td>{{status == 0 ? '未改':'已改'}}</td>
                     <td>{{note}}</td>
@@ -34,7 +34,7 @@
     <div id="interviewEdit" style="padding-top:100px;display:none">
         <div class="alert alert-info" role="alert">
             <h3 class="display-3">{{data[count].name}}</h3>
-            <p class="lead">測驗耗時:{{data[count].test_time}}</p>
+            <p class="lead">測驗耗時:{{data[count].testtime}}秒</p>
             <p class="lead">分數:{{data[count].score == ''? '尚未批改': data[count].score}}</p>
             <hr class="my-4">
             <p>狀態:{{data[count].status == 0 ? '尚未批改':'已改'}}</p>
@@ -45,9 +45,19 @@
         <div class="panel panel-default" style="margin-bottom:20px;">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <button class="btn btn-info" data-toggle="collapse" data-parent="#accordion" href="#choice"> 選擇題 </button>
-                    <button class="btn btn-info" data-toggle="collapse" data-parent="#accordion" href="#short"> 簡答題 </button>
+                    <button class="btn btn-info" data-toggle="collapse" href="#choice" on-click="choicebar"> 選擇題 </button>
+                    <button class="btn btn-info" data-toggle="collapse" href="#short" on-click="shortbar"> 簡答題 </button>
                 </h4>
+            </div>
+            <div id="choice" class="collapse">
+                {{#each testdata:i}}
+                {{#if type == 1}}
+                <div style="padding:20px; background-color: #f0f0f0">
+                    <div class="alert alert-success">ANSWER:<br>{{answer}}</div>
+                    <div class="alert" style="background-color:#e8d1d1">Interviewee:<br />{{interviewdata[i]}}</div>
+                </div>
+                {{/if}}
+                {{/each}}
             </div>
             <div id="short" class="collapse">
                 {{#each testdata:i}}
@@ -62,13 +72,36 @@
             </div>
         </div>
         <label>輸入分數</label>
-        <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+        <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" name="score" value="{{upscore}}">
+        <label>備註</label>
+        <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" name="note" value="{{upnote}}">
         <div style="margin:20px 0px">
             <button class="btn btn-primary" on-click="back">返回</button>
-            <button class="btn btn-danger" on-click="edit">批改完成</button>
+            <button class="btn btn-danger" data-toggle="modal" data-target="#exampleModal" on-click="edit">批改完成</button>
         </div>
     </div>
 
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">批改完成</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h4 class="display-3">{{data[count].name}}</h4>
+                    <p>分數:{{upscore}}</p>
+                    <p>備註:{{upnote}}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" on-click="reload">返回上一頁</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </script>
 
 <script>
@@ -80,8 +113,10 @@
             message: '',
             data: '',
             testdata: '',
-            interviewdata:[],
-            count:''
+            interviewdata: [],
+            count: '',
+            upscore: '',
+            upnote: ''
         },
         on: {
             correct: function (ctx) {
@@ -90,11 +125,13 @@
                 this.set('count', id - 1);
                 this.set('interviewdata', interviewdata[id - 1].answer.split(","));
                 console.log(interviewdata[id - 1].answer.split(","));
+                this.set('upscore', interviewdata[id - 1].score);
+                this.set('upnote', interviewdata[id - 1].note);
                 $.ajax({
-                url: '/api/InterviewTest',
-                type: 'GET',
-                context: this,
-                dataType: 'json'
+                    url: '/api/InterviewTest',
+                    type: 'GET',
+                    context: this,
+                    dataType: 'json'
                 }).done(function (data) {
                     if (data == '') {
                         this.set('message', '資料出錯');
@@ -111,6 +148,38 @@
             back: function (ctx) {
                 $('#interviewList').show();
                 $('#interviewEdit').hide();
+            },
+            edit: function (ctx) {
+                var upscore = this.get('upscore');
+                var upnote = this.get('upnote');
+                var count = this.get('count') + 1;
+                var json = { score: upscore, note: upnote };
+                $.ajax({
+                    url: '/api/Background?count=' + count,
+                    type: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    data: JSON.stringify(json),
+                    context: this,
+                    dataType: 'json'
+                })
+                .done(function (data) {
+
+                })
+                .fail(function (xhr, status) {
+
+                });
+
+            },
+            choicebar: function (ctx) {
+                $('#short').collapse('hide');
+            },
+            shortbar: function (ctx) {
+                $('#choice').collapse('hide');
+            },
+            reload: function (ctx) {
+                location.reload();
             }
         },
         oncomplete: function () {

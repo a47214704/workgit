@@ -71,8 +71,30 @@ namespace interview_test.Controllers
 
         // POST api/<controller>
         [HttpPost]
-        public void Post([FromBody]string value)
+        public ActionResult<TestDone> POST([FromQuery]long count,[FromBody]TestDone TestDone)
         {
+            List<TestDone> list = new List<TestDone>();
+            try
+            {
+                conn.Open();    //打开数据库连接
+                MySqlCommand cmd;
+                cmd = conn.CreateCommand();
+                cmd.CommandText = $"UPDATE interviewee SET status = '1', score = @score, note = @note WHERE id = @count";
+                cmd.Parameters.AddWithValue("@score", TestDone.SCORE.ToString());
+                cmd.Parameters.AddWithValue("@note", TestDone.NOTE.ToString());
+                cmd.Parameters.AddWithValue("@count", count.ToString());
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                //⑦关闭连接 
+                conn.Close();
+            }
+            return this.Ok(new ActionResult<TestDone>(TestDone));
         }
 
         // PUT api/<controller>/5

@@ -14,7 +14,6 @@ D:\asp\interview_test\interview_test\obj\Debug\netcoreapp2.1\interview_test.Asse
 D:\asp\interview_test\interview_test\obj\Debug\netcoreapp2.1\interview_test.TagHelpers.input.cache
 D:\asp\interview_test\interview_test\obj\Debug\netcoreapp2.1\interview_test.TagHelpers.output.cache
 D:\asp\interview_test\interview_test\obj\Debug\netcoreapp2.1\interview_test.RazorCoreGenerate.cache
-D:\asp\interview_test\interview_test\obj\Debug\netcoreapp2.1\Razor\Views\Home\Contact.g.cshtml.cs
 D:\asp\interview_test\interview_test\obj\Debug\netcoreapp2.1\Razor\Views\Home\Index.g.cshtml.cs
 D:\asp\interview_test\interview_test\obj\Debug\netcoreapp2.1\Razor\Views\Home\Privacy.g.cshtml.cs
 D:\asp\interview_test\interview_test\obj\Debug\netcoreapp2.1\Razor\Views\Shared\Error.g.cshtml.cs
@@ -32,3 +31,4 @@ D:\asp\interview_test\interview_test\obj\Debug\netcoreapp2.1\interview_test.cspr
 D:\asp\interview_test\interview_test\obj\Debug\netcoreapp2.1\Razor\Views\Home\TestPage1.g.cshtml.cs
 D:\asp\interview_test\interview_test\obj\Debug\netcoreapp2.1\Razor\Views\Home\Finishpage.g.cshtml.cs
 D:\asp\interview_test\interview_test\obj\Debug\netcoreapp2.1\Razor\Views\Home\Background.g.cshtml.cs
+D:\asp\interview_test\interview_test\obj\Debug\netcoreapp2.1\Razor\Views\Home\Question.g.cshtml.cs
